@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#FFFFFF">
+<title>ホームページチェックくん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&text=%E3%81%8F%E3%82%93&display=swap" rel="stylesheet">
+<style>
+/* ホームページチェックくん（v0.1.0）：Vcheckくんと同じ作り。白を土台にティール #029AAA、イエロー #E5E647 は強調だけ。
+   コンセプトは「70歳の方でも使える」：ボタンは大きく、手順は3つ、説明は最小限。 */
+:root {
+  --teal:#029AAA; --teal-ink:#027A87; --teal-deep:#01646F; --navy:#06304F; --yellow:#E5E647;
+  --ink:#1B1F24; --sub:#5B6670; --line:#E3E7EA; --bg:#FFFFFF; --bg2:#F3F5F6; --tint:#E6F5F6; --ytint:#F8F8C8;
+  --danger:#B42318; --pin:#E5484D;
+  --grad-btn:linear-gradient(135deg, #03A3B4 0%, #029AAA 50%, #028F9E 100%);
+  --grad-done:linear-gradient(135deg, #F2F36A 0%, #E5E647 55%, #D9DA35 100%);
+  --headH:68px;
+  color-scheme: light;
+}
+* { box-sizing:border-box; }
+[hidden] { display:none !important; }
+html { background:var(--bg); -webkit-text-size-adjust:100%; }
+body { margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+  font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Meiryo",system-ui,sans-serif; font-size:16px; line-height:1.6; }
+button, input, textarea { font:inherit; color:inherit; }
+button { cursor:pointer; }
+button:disabled { cursor:not-allowed; opacity:.45; }
+:focus-visible { outline:3px solid var(--teal-ink); outline-offset:2px; }
+svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stroke-width:1.9; stroke-linecap:round; stroke-linejoin:round; }
+
+/* ヘッダー：ロゴ・PC／スマホの切り替え・レビュー完了 */
+.top { position:sticky; top:0; z-index:30; height:var(--headH); display:flex; align-items:center; gap:16px; padding:0 20px; padding-top:env(safe-area-inset-top, 0px);
+  background:rgba(255,255,255,.97); backdrop-filter:saturate(1.4) blur(8px); border-bottom:1px solid var(--line); }
+.logo { display:flex; align-items:baseline; gap:6px; text-decoration:none; color:var(--teal); flex:none; }
+.logo b { font-family:"Nunito","Hiragino Sans",sans-serif; font-weight:900; font-size:30px; letter-spacing:-.02em; line-height:1; }
+.logo b i { font-style:normal; position:relative; }
+.logo b i::after { content:""; position:absolute; right:-3px; top:-3px; width:9px; height:9px; border-radius:50%; background:var(--yellow); box-shadow:0 0 0 2px #fff; }
+.logo .kun { font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif; font-weight:800; font-size:21px; color:var(--teal); line-height:1; margin-left:-2px; }
+.seg { display:inline-flex; background:var(--bg2); border-radius:999px; padding:4px; gap:4px; margin:0 auto; }
+.seg button { display:inline-flex; align-items:center; gap:8px; min-height:48px; padding:0 22px; border:none; border-radius:999px; background:none; font-weight:800; font-size:17px; color:var(--sub); }
+.seg button[aria-pressed="true"] { background:#fff; color:var(--teal-deep); box-shadow:0 1px 4px rgba(6,48,79,.18); }
+.seg svg.i { width:22px; height:22px; }
+
+/* ボタン */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:52px; min-width:52px; padding:8px 20px; border-radius:999px;
+  border:1.5px solid var(--line); background:#fff; color:var(--ink); font-weight:800; font-size:16px; white-space:nowrap; }
+.btn:hover { border-color:#C9D1D6; }
+.btn.primary { background:var(--grad-btn); color:#fff; border-color:transparent; font-size:19px; box-shadow:0 2px 8px rgba(2,154,170,.28); }
+.btn.primary:hover { filter:brightness(1.04); }
+.btn.done { background:var(--grad-done); color:var(--navy); border:1.5px solid #B9BA1F; font-size:18px; box-shadow:0 3px 10px rgba(150,150,20,.35); }
+.btn.done:hover { filter:brightness(1.03); }
+.btn.line { border-color:var(--teal-ink); color:var(--teal-ink); }
+.btn.quiet { color:var(--sub); font-weight:700; }
+.btn.danger { border-color:#E7B4AE; color:var(--danger); }
+.btn.on { background:var(--tint); border-color:var(--teal-ink); color:var(--teal-deep); }
+.btn.sm { min-height:40px; padding:4px 14px; font-size:14px; }
+.cnt { display:inline-grid; place-items:center; min-width:24px; height:24px; padding:0 7px; border-radius:999px; background:var(--navy); color:#fff; font-size:13px; font-weight:800; }
+.btn.done.hdone { flex:none; }
+
+/* 2列：左に画面写真、右にコメント */
+.wrap { display:grid; grid-template-columns:minmax(0,1fr) 440px; gap:24px; max-width:1760px; margin:0 auto; padding:16px 24px 24px; align-items:start; }
+.main { min-width:0; display:flex; flex-direction:column; gap:14px; }
+.info h1 { font-size:22px; font-weight:800; margin:0; line-height:1.4; overflow-wrap:anywhere; }
+.info .meta { color:var(--sub); font-size:14px; margin:2px 0 0; display:flex; flex-wrap:wrap; gap:2px 14px; }
+.info .meta a { color:var(--teal-ink); }
+/* 手順は3つ */
+.flow { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:10px; margin:0; padding:0; list-style:none; font-size:16px; font-weight:800; }
+.flow li { display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg2); line-height:1.4; }
+.flow b { flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--teal-ink); color:#fff; font-size:17px; }
+
+/* 画面写真 */
+.stage { background:var(--bg2); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:center; }
+.stage.sp { padding:24px 18px; }
+.shot { position:relative; width:100%; background:#fff; box-shadow:0 2px 14px rgba(6,48,79,.12); cursor:crosshair; user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; }
+.stage.sp .shot { width:390px; max-width:100%; border-radius:26px; overflow:hidden; border:10px solid #1B1F24; box-shadow:0 6px 24px rgba(6,48,79,.25); }
+.shot img { display:block; width:100%; height:auto; pointer-events:none; }
+.shot .loading { padding:80px 20px; text-align:center; color:var(--sub); }
+#ink { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible; }
+#ink.on { pointer-events:auto; touch-action:none; cursor:crosshair; }
+.pins { position:absolute; inset:0; pointer-events:none; }
+.pin { position:absolute; transform:translate(-50%, -50%); width:40px; height:40px; border-radius:50%; border:3px solid #fff; background:var(--pin); color:#fff;
+  font-weight:900; font-size:18px; display:grid; place-items:center; box-shadow:0 2px 8px rgba(0,0,0,.35); pointer-events:auto; padding:0; font-family:"Nunito","Hiragino Sans",sans-serif; }
+.pin.sel { background:var(--navy); box-shadow:0 0 0 4px var(--yellow), 0 2px 8px rgba(0,0,0,.35); z-index:2; }
+.pin.new { background:var(--yellow); color:var(--navy); border-color:var(--navy); animation:pop .9s ease-in-out infinite alternate; z-index:3; }
+@keyframes pop { to { transform:translate(-50%, -50%) scale(1.12); } }
+#inkText { position:absolute; z-index:4; font-size:16px; padding:8px 10px; background:rgba(6,48,79,.92); color:#fff; border:2px solid var(--yellow); border-radius:8px; width:min(260px, 70%); outline:none; }
+
+/* 右：書く欄・一覧・全体へのコメント・届け方 */
+.aside { min-width:0; position:sticky; top:calc(var(--headH) + 16px); max-height:calc(100vh - var(--headH) - 32px); overflow:auto; display:flex; flex-direction:column; gap:14px; padding:0 4px 8px 0; }
+.card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:16px; min-width:0; }
+.card h2 { font-size:18px; margin:0 0 10px; font-weight:800; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.composer .idle { display:flex; align-items:center; gap:14px; font-size:17px; font-weight:800; color:var(--teal-deep); background:var(--tint); border-radius:12px; padding:16px; margin:0; line-height:1.5; }
+.composer .idle svg.i { width:34px; height:34px; color:var(--teal); }
+.pinbadge { display:inline-grid; place-items:center; width:34px; height:34px; border-radius:50%; background:var(--yellow); color:var(--navy); border:2px solid var(--navy); font-weight:900; font-size:16px; font-family:"Nunito","Hiragino Sans",sans-serif; }
+.where { font-size:13px; color:var(--sub); font-weight:600; }
+#box { width:100%; min-height:96px; max-height:220px; resize:none; font-size:18px; line-height:1.55; padding:12px 14px; border:2px solid var(--line); border-radius:14px; background:#fff; outline:none; display:block; }
+#box:focus { border-color:var(--teal-ink); box-shadow:0 0 0 3px rgba(2,154,170,.14); }
+.tools { display:grid; grid-template-columns:repeat(auto-fit, minmax(110px, 1fr)); gap:8px; margin-top:10px; }
+.tools .btn { min-height:52px; padding:6px 10px; font-size:16px; }
+#mic.on { background:#C0262D; border-color:#C0262D; color:#fff; animation:pulse 1s infinite; }
+@keyframes pulse { 50% { opacity:.72; } }
+.draw { border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:10px; background:var(--bg2); }
+.draw .row { display:flex; flex-wrap:wrap; gap:6px; align-items:center; }
+.draw .row + .row { margin-top:8px; }
+.draw .btn { min-height:46px; padding:4px 12px; font-size:15px; gap:4px; }
+.draw .btn svg.i { width:20px; height:20px; }
+.draw .btn[data-tool].on { background:var(--yellow); border-color:var(--navy); color:var(--navy); }
+.draw .dot { width:46px; height:46px; border-radius:50%; padding:0; border:3px solid #fff; box-shadow:0 0 0 1.5px #B9C3C9; background:var(--c); }
+.draw .dot.on { box-shadow:0 0 0 3.5px var(--navy); }
+.draw .note { margin:8px 0 0; font-size:13px; color:var(--sub); }
+.actrow { display:flex; gap:10px; margin-top:12px; }
+.actrow .btn { flex:1; }
+.actrow #add { flex:2; }
+.hint { font-size:13px; color:var(--sub); margin:8px 0 0; }
+.thumbs { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.thumbs:empty { display:none; }
+.thumbs img { height:48px; border-radius:6px; border:1px solid var(--line); cursor:pointer; }
+
+.listhead { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+.listhead h2 { margin:0; }
+.listhead span { color:var(--sub); font-size:14px; font-weight:700; }
+#list { list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; }
+#list li { display:grid; grid-template-columns:auto minmax(0,1fr); column-gap:12px; row-gap:6px; padding:12px 0; border-bottom:1px solid var(--line); }
+#list li:last-child { border-bottom:none; }
+#list li.sel { background:var(--ytint); border-radius:10px; padding-left:8px; padding-right:8px; }
+#list .num { grid-row:1 / span 3; width:38px; height:38px; border-radius:50%; background:var(--pin); color:#fff; border:none; font-weight:900; font-size:17px; display:grid; place-items:center; padding:0; font-family:"Nunito","Hiragino Sans",sans-serif; }
+#list .ctext { white-space:pre-wrap; overflow-wrap:anywhere; font-weight:700; font-size:16px; line-height:1.5; padding-top:6px; }
+.badges { display:flex; flex-wrap:wrap; gap:6px; font-size:12px; }
+.badge { border-radius:4px; padding:1px 7px; background:var(--bg2); color:var(--sub); font-weight:700; }
+.badge.ok { background:var(--tint); color:var(--teal-deep); }
+.badge.wait { background:var(--ytint); color:var(--navy); }
+.acts { display:flex; gap:8px; }
+.acts .btn { min-height:38px; padding:2px 14px; font-size:14px; }
+#list li .edit textarea { width:100%; min-height:80px; font-size:17px; padding:8px 10px; border:2px solid var(--teal-ink); border-radius:10px; resize:vertical; }
+.empty { color:var(--sub); font-size:15px; margin:8px 0 0; }
+.overall textarea { width:100%; min-height:110px; resize:vertical; font-size:17px; line-height:1.55; padding:10px 12px; border:2px solid var(--line); border-radius:12px; background:#fff; }
+.overall .sub { font-size:14px; color:var(--sub); font-weight:600; }
+.overall .crow { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.field { display:flex; flex-direction:column; gap:4px; font-size:14px; color:var(--sub); }
+.field b { color:var(--ink); font-weight:800; font-size:16px; }
+.field input { font-size:17px; padding:10px 12px; border:2px solid var(--line); border-radius:12px; background:#fff; color:var(--ink); min-height:52px; }
+.sendrow { display:flex; flex-direction:column; gap:10px; }
+.sendrow .btn { width:100%; }
+.sendrow .sub2 { display:flex; gap:8px; }
+.sendrow .sub2 .btn { flex:1; }
+.state { font-size:14px; font-weight:700; border-radius:10px; padding:8px 12px; margin:10px 0 0; background:var(--bg2); }
+.state.unsent { background:var(--ytint); color:var(--navy); }
+.state.done { background:var(--tint); color:var(--teal-deep); }
+.result { font-size:15px; font-weight:700; border-radius:10px; padding:8px 12px; margin:10px 0 0; }
+.result.ok { background:var(--tint); color:var(--teal-deep); }
+.result.ng { background:#FDECEA; color:var(--danger); }
+#copyBox { width:100%; min-height:120px; font-size:15px; padding:10px; border:2px solid var(--line); border-radius:10px; margin-top:8px; }
+.fb > summary { cursor:pointer; color:var(--sub); font-size:14px; font-weight:700; min-height:40px; display:flex; align-items:center; list-style:none; }
+.fb > summary::-webkit-details-marker { display:none; }
+.fb textarea { width:100%; min-height:70px; font-size:16px; padding:8px 10px; border:1.5px solid var(--line); border-radius:10px; }
+.fb .row { display:flex; justify-content:flex-end; margin-top:6px; }
+.sheethead { display:none; }
+.mbar { display:none; }
+.toast { position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom, 0px)); transform:translateX(-50%); max-width:calc(100% - 32px); background:var(--navy); color:#fff;
+  padding:12px 18px; border-radius:12px; font-weight:800; font-size:16px; opacity:0; transition:opacity .2s; pointer-events:none; z-index:80; box-shadow:0 6px 20px rgba(6,48,79,.3); }
+.toast.show { opacity:1; }
+.ver { text-align:right; color:var(--sub); font-size:11px; padding:0 16px 16px; }
+
+/* 1000px 以下（スマホ・タブレット）：写真を幅いっぱいに。書く欄と一覧は下から出る */
+@media (max-width: 1000px) {
+  :root { --headH:60px; }
+  .top { padding:0 10px; gap:8px; }
+  .logo b { font-size:24px; } .logo .kun { font-size:17px; }
+  .seg { margin-left:auto; margin-right:0; }
+  .seg button { min-height:44px; padding:0 14px; font-size:16px; gap:6px; }
+  .seg svg.i { display:none; }
+  .top .hdone { display:none; }
+  .wrap { display:block; padding:10px 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
+  .main { gap:10px; }
+  .info, .flow { margin:0 12px; }
+  .info h1 { font-size:18px; }
+  .flow { grid-template-columns:1fr; gap:6px; }
+  .flow li { padding:8px 12px; font-size:15px; }
+  .flow b { width:28px; height:28px; font-size:15px; }
+  .stage, .stage.sp { border-radius:0; border-left:none; border-right:none; padding:0; background:#fff; }
+  .stage.sp .shot { width:100%; border:none; border-radius:0; box-shadow:none; }
+  .shot { box-shadow:none; }
+  .aside { position:static; max-height:none; overflow:visible; padding:0; display:block; }
+  /* 下から出る欄（書く欄・一覧） */
+  .sheet { position:fixed; left:0; right:0; bottom:0; z-index:50; max-height:82vh; overflow:auto; border-radius:20px 20px 0 0; border:none;
+    box-shadow:0 -8px 30px rgba(6,48,79,.25); padding:14px 14px calc(14px + env(safe-area-inset-bottom, 0px)); background:#fff; }
+  .composer.sheet { display:none; }
+  body.composing .composer.sheet { display:block; }
+  body.composing.drawing #box, body.composing.drawing #mic, body.composing.drawing #att { display:none !important; }   /* 描く間は写真を広く。「描き終わる」は残す */
+  #panel { display:none; }
+  body.listopen #panel { display:flex; flex-direction:column; gap:12px; background:var(--bg2); }
+  .sheethead { display:flex; align-items:center; justify-content:space-between; gap:8px; position:sticky; top:-14px; z-index:2; background:var(--bg2); margin:-14px -14px 0; padding:12px 14px; border-radius:20px 20px 0 0; }
+  .toast { bottom:calc(92px + env(safe-area-inset-bottom, 0px)); }
+  .sheethead h2 { margin:0; font-size:19px; }
+  .scrim { position:fixed; inset:0; background:rgba(6,48,79,.35); z-index:45; }
+  .mbar { display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40; gap:8px; padding:10px 12px calc(10px + env(safe-area-inset-bottom, 0px)); background:rgba(255,255,255,.97); border-top:1px solid var(--line); box-shadow:0 -4px 16px rgba(6,48,79,.08); }
+  .mbar .btn { flex:1; min-height:56px; font-size:17px; padding:6px 10px; }
+  body.composing .mbar, body.listopen .mbar { display:none; }
+  .composer .idle { display:none; }
+  .composer h2 { margin-bottom:8px; }
+  #box { min-height:80px; font-size:17px; }
+}
+@media (min-width: 1001px) { .scrim { display:none !important; } #panel { display:flex; flex-direction:column; gap:14px; } }
+@media (max-width: 380px) { .seg button { padding:0 10px; font-size:15px; } .logo .kun { display:none; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="logo" href="#" id="logo" aria-label="ホームページチェックくん"><b>HP<i></i>check</b><span class="kun">くん</span></a>
+  <div class="seg" role="group" aria-label="見る画面">
+    <button id="devPc" data-dev="pc" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8.5 20h7M12 16.5V20"/></svg>パソコン</button>
+    <button id="devSp" data-dev="sp" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>スマホ</button>
+  </div>
+  <button class="btn done hdone" id="topReturn"><span class="ricon"></span><span class="rlabel">レビュー完了</span> <span class="cnt unsentN" hidden>0</span></button>
+</header>
+<div class="scrim" id="scrim" hidden></div>
+<div class="wrap">
+  <main class="main">
+    <section class="info">
+      <h1 id="ttl">（ページを読み込み中）</h1>
+      <p class="meta" id="meta"></p>
+    </section>
+    <ol class="flow">
+      <li><b>1</b><span>気になる所を押す</span></li>
+      <li><b>2</b><span>一言書いて（声でも）「追加」</span></li>
+      <li><b>3</b><span id="flow3">終わったら「レビュー完了」</span></li>
+    </ol>
+    <div class="stage" id="stage">
+      <div class="shot" id="shot">
+        <p class="loading" id="loading">画面を読み込んでいます…</p>
+        <img id="img" alt="確認するページの画面" hidden>
+        <svg id="ink" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"></svg>
+        <div class="pins" id="pins"></div>
+        <input id="inkText" hidden placeholder="文字を入れて Enter" autocomplete="off" enterkeyhint="done">
+      </div>
+    </div>
+  </main>
+
+  <aside class="aside">
+    <div class="card composer sheet" id="composer">
+      <p class="idle" id="idle"><svg class="i" viewBox="0 0 24 24"><path d="M9 11.5V5a1.5 1.5 0 013 0v5.5"/><path d="M12 10.5V9a1.5 1.5 0 013 0v2"/><path d="M15 11V10a1.5 1.5 0 013 0v4.5a6 6 0 01-6 6h-.6a6 6 0 01-4.9-2.6L4 14.5a1.6 1.6 0 012.5-2L9 15"/></svg><span>左の画面で、直してほしい所を押してください</span></p>
+      <div id="write" hidden>
+        <h2><span class="pinbadge" id="pinNo">1</span>ここに一言<span class="where" id="where"></span></h2>
+        <textarea id="box" rows="3" placeholder="例：この文字をもっと大きく" autocomplete="off" enterkeyhint="enter" aria-label="コメント"></textarea>
+        <div class="tools">
+          <button class="btn" id="mic" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg><span>声で入れる</span></button>
+          <button class="btn" id="drawOpen" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span>描く</span></button>
+          <button class="btn" id="att" hidden><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg><span>画像</span></button>
+        </div>
+        <div class="thumbs" id="pendThumbs"></div>
+        <div class="draw" id="draw" hidden>
+          <div class="row">
+            <button class="btn" data-tool="p"><svg class="i" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>ペン</button>
+            <button class="btn" data-tool="a"><svg class="i" viewBox="0 0 24 24"><path d="M5 19L19 5M10 5h9v9"/></svg>矢印</button>
+            <button class="btn" data-tool="r"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.5"/></svg>四角</button>
+            <button class="btn" data-tool="o"><svg class="i" viewBox="0 0 24 24"><ellipse cx="12" cy="12" rx="8.5" ry="7.5"/></svg>丸</button>
+            <button class="btn" data-tool="t"><svg class="i" viewBox="0 0 24 24"><path d="M5 7V5h14v2M12 5v14M9 19h6"/></svg>文字</button>
+          </div>
+          <div class="row">
+            <button class="dot" data-color="y" style="--c:#f2d33a" aria-label="黄"></button>
+            <button class="dot" data-color="r" style="--c:#ff3b3b" aria-label="赤"></button>
+            <button class="dot" data-color="w" style="--c:#ffffff" aria-label="白"></button>
+            <button class="btn quiet" id="undo"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 010 11H11"/></svg>1つ戻す</button>
+          </div>
+          <p class="note">画面の上を指やマウスでなぞって描きます。</p>
+        </div>
+        <div class="actrow">
+          <button class="btn quiet" id="cancel">やめる</button>
+          <button class="btn primary" id="add" disabled>追加</button>
+        </div>
+        <p class="hint" id="keyHint" hidden>Enter で追加・Shift＋Enter で改行・Esc でやめる</p>
+      </div>
+    </div>
+
+    <div id="panel" class="sheet">
+      <div class="sheethead"><h2>コメント一覧</h2><button class="btn sm quiet" id="panelClose">閉じる</button></div>
+      <div class="card">
+        <div class="listhead"><h2>コメント</h2><span id="count"></span></div>
+        <ol id="list"></ol>
+        <p class="empty" id="empty">まだありません。画面の気になる所を押してください。</p>
+      </div>
+      <div class="card overall">
+        <h2>全体へのコメント<span class="sub">場所が決まらないこと</span></h2>
+        <textarea id="ov" placeholder="例：&#10;・全体的に文字を大きく&#10;・色をもう少し明るく"></textarea>
+        <div class="crow"><button class="btn sm quiet" id="ovMic" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>声で入れる</button><button class="btn sm quiet" id="ovatt" hidden><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg>画像を付ける</button></div>
+        <div class="thumbs" id="ovthumbs"></div>
+      </div>
+      <div class="card">
+        <label class="field"><span><b>お名前</b>（なくても大丈夫です）</span><input id="name" autocomplete="off" placeholder="例：山田"></label>
+        <div class="sendrow" style="margin-top:14px">
+          <button class="btn done" id="send" hidden><svg class="i" viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5z"/></svg><span class="lbl">レビュー完了</span></button>
+          <button class="btn line" id="copy"><svg class="i" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>コメントを全てコピー</button>
+          <div class="sub2"><button class="btn sm quiet" id="share">このページのリンクをコピー</button><button class="btn sm danger" id="clear">全部消す</button></div>
+        </div>
+        <p class="state" id="saveState" role="status" hidden></p>
+        <p class="result" id="result" role="status" hidden></p>
+        <textarea id="copyBox" readonly hidden aria-label="コピーする文"></textarea>
+        <details class="fb" id="fbArea" hidden>
+          <summary>ホームページチェックくんへの要望・不具合</summary>
+          <textarea id="fbText" placeholder="例：ボタンが小さくて押しにくい"></textarea>
+          <div class="row"><button class="btn sm line" id="fbSend">送る</button></div>
+          <p class="result" id="fbResult" hidden></p>
+        </details>
+      </div>
+    </div>
+  </aside>
+</div>
+<div class="mbar" id="mbar">
+  <button class="btn line" id="openList"><svg class="i" viewBox="0 0 24 24"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg>一覧 <span class="cnt" id="allN">0</span></button>
+  <button class="btn done" id="mReturn"><span class="ricon"></span><span class="rlabel">レビュー完了</span> <span class="cnt unsentN" hidden>0</span></button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="ver">ホームページチェックくん v0.1.0</div>
+<input type="file" id="pick" accept="image/*" multiple hidden>
+<script>
+// ホームページチェックくん（版は VER）。確認してもらうページの縦長の画面写真（PC・スマホ）に、押した所のピンと一言・描き込みを残す。
+// 使い方：index.html?p=<pages の下の名前>&to=<受け取り口の URL>。画面写真は 道具/shot.py で作る（pages/<名前>/pc.jpg・sp.jpg・page.js）。
+// コメントは見た人のブラウザに残り、「レビュー完了」を押した時だけ受け取り口（Vcheckくんと同じ Google Apps Script）に届く。
+const VER = "0.1.0";
+const Q = new URLSearchParams(location.search);
+const $ = id => document.getElementById(id);
+const PID = (Q.get("p") || "crifa-top").replace(/[^A-Za-z0-9_-]/g, "");   // 何も無い時は動作見本（クリファのトップ）
+const KEY = "hpcheck:" + PID;
+const TOUCH = matchMedia("(pointer: coarse)").matches;
+const NARROW = () => innerWidth <= 1000;
+const RECEIVER = Q.get("to") || "";       // 受け取り口（このページを置いた人の Google）。無い時は「コメントを全てコピー」で返してもらう
+const FEEDBACK_ID = "hpcheck-request";
+let PAGE = null, dev = (TOUCH || NARROW()) ? "sp" : "pc";
+let items = [], overall = { text: "", images: [], sentText: null, sentN: 0 }, saveOK = true;
+try { items = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { items = []; }
+try { overall = Object.assign(overall, JSON.parse(localStorage.getItem(KEY + ":overall") || "{}")); } catch (e) {}
+const nameEl = $("name");
+try { nameEl.value = localStorage.getItem("hpcheck:name") || ""; } catch (e) {}
+nameEl.addEventListener("change", () => { try { localStorage.setItem("hpcheck:name", nameEl.value.trim()); } catch (e) {} });
+function save() { try { localStorage.setItem(KEY, JSON.stringify(items)); saveOK = true; } catch (e) { saveOK = false; } }
+function saveOverall() { try { localStorage.setItem(KEY + ":overall", JSON.stringify(overall)); } catch (e) { toast("画像が多くて保存しきれません。レビュー完了を押してください", 3000); } }
+let toastTimer = 0;
+function toast(m, ms) { const e = $("toast"); e.textContent = m; e.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("show"), ms || 2000); }
+const DEVNAME = { pc: "パソコン", sp: "スマホ" };
+const CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
+const numStr = n => CIRC[n - 1] || "(" + n + ")";
+function shotOf(d) { return PAGE && PAGE.shots[d || dev]; }
+function whereText(it) {          // 「上から 1234px（14%）・左から 40%」（ページの左上から。写真を撮った幅での px）
+  const s = shotOf(it.dev); if (!s) return "";
+  return "上から " + Math.round(it.y) + "px（" + Math.round(it.y / s.h * 100) + "%）・左から " + Math.round(it.x / s.w * 100) + "%";
+}
+
+// ---- ページ（画面写真）を読む：pages/<名前>/page.js（file:// で開いても読めるように script で読む）
+(function loadPage() {
+  const s = document.createElement("script"); s.src = "pages/" + PID + "/page.js?" + Date.now();
+  s.onload = () => { PAGE = (window.HP_PAGES || {})[PID]; if (!PAGE) return fail(); start(); };
+  s.onerror = fail; document.head.append(s);
+  function fail() { $("loading").textContent = "確認するページが見つかりません。送られてきたリンクをもう一度開いてください。"; $("ttl").textContent = "ページが見つかりません"; }
+})();
+function start() {
+  $("ttl").textContent = PAGE.title; document.title = PAGE.title + "｜ホームページチェックくん";
+  const m = $("meta"); m.innerHTML = "";
+  const a = document.createElement("a"); a.href = PAGE.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = PAGE.url; m.append(a);
+  const sp = document.createElement("span"); sp.textContent = PAGE.made + " の画面"; m.append(sp);
+  setDev(dev);
+}
+function setDev(d) {
+  dev = d;
+  document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dev === d)));
+  $("stage").className = "stage " + d;
+  if (!PAGE) return;
+  if (pending && pending.dev !== d) cancelPin();
+  const s = shotOf(), img = $("img");
+  img.hidden = true; $("loading").hidden = false; $("loading").textContent = "画面を読み込んでいます…";
+  img.onload = () => { img.hidden = false; $("loading").hidden = true; drawAll(); };
+  img.onerror = () => { $("loading").textContent = "画面の写真を読み込めませんでした。電波を確かめて、ページを読み込み直してください。"; };
+  img.src = "pages/" + PID + "/" + s.img;
+  $("ink").setAttribute("viewBox", "0 0 " + s.w + " " + s.h);
+  drawAll();
+}
+document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { if (b.dataset.dev !== dev) { setDev(b.dataset.dev); scrollTo({ top: 0 }); } });
+
+// ---- ピン（押した所）と書く欄
+let pending = null, selN = 0, shapes = [], pendImgs = [];
+const shot = $("shot"), box = $("box"), ink = $("ink");
+function toPage(e) {               // 押した所 → ページの座標（写真を撮った幅の px）
+  const r = shot.getBoundingClientRect(), s = shotOf();
+  return [Math.max(0, Math.min(s.w, (e.clientX - r.left) / r.width * s.w)), Math.max(0, Math.min(s.h, (e.clientY - r.top) / r.height * s.h))];
+}
+shot.addEventListener("click", e => {
+  if (!PAGE || $("img").hidden || drawOn || e.target.closest(".pin") || e.target === $("inkText")) return;
+  const [x, y] = toPage(e);
+  if (pending) { pending.x = x; pending.y = y; }        // 書いている途中なら、ピンだけ動かす
+  else { pending = { dev, x, y }; shapes = []; pendImgs = []; showPend(); }
+  selN = 0; openComposer(); drawAll();
+});
+function openComposer() {
+  $("idle").hidden = true; $("write").hidden = false;
+  document.body.classList.add("composing"); closeList();
+  $("pinNo").textContent = items.length + 1; $("where").textContent = DEVNAME[pending.dev];
+  $("keyHint").hidden = TOUCH;
+  refresh();
+  if (!TOUCH) box.focus({ preventScroll: true });
+  if (NARROW()) setTimeout(() => keepPinVisible(), 60);
+}
+function keepPinVisible() {        // スマホ：下から出た欄にピンが隠れないように
+  if (!pending) return;
+  const r = shot.getBoundingClientRect(), s = shotOf(), py = r.top + pending.y / s.h * r.height;
+  const sheetTop = innerHeight - $("composer").offsetHeight, head = document.querySelector(".top").offsetHeight;
+  if (py > sheetTop - 50 || py < head + 20) scrollTo({ top: scrollY + py - head - Math.max(80, (sheetTop - head) * 0.35), behavior: "smooth" });
+}
+function hasDraft() { return !!(box.value.trim() || shapes.length || pendImgs.length); }
+function refresh() { $("add").disabled = !pending || !hasDraft(); }
+function cancelPin() {
+  if (listening && rec) { micWant = false; try { rec.abort(); } catch (e) {} }
+  pending = null; shapes = []; pendImgs = []; box.value = ""; showPend(); showDraw(false); closeText(false);
+  $("idle").hidden = false; $("write").hidden = true; document.body.classList.remove("composing", "drawing"); box.blur(); drawAll();
+}
+function commit() {
+  if (!pending) return;
+  const text = box.value.trim() || (shapes.length ? "（描き込み）" : "") || (pendImgs.length ? "（画像）" : "");
+  if (!text) { box.focus(); return; }
+  const it = { dev: pending.dev, x: Math.round(pending.x), y: Math.round(pending.y), text, at: Date.now() };
+  if (shapes.length) it.d = shapes.map(roundShape);
+  if (pendImgs.length) it.images = pendImgs.slice();
+  items.push(it); save(); const n = items.length;
+  cancelPin(); render();
+  toast(saveOK ? numStr(n) + " を追加しました" : "追加しましたが、このブラウザに保存できませんでした", 2200);
+}
+$("add").onclick = commit;
+$("cancel").onclick = cancelPin;
+box.addEventListener("input", refresh);
+box.addEventListener("keydown", e => {
+  if (e.isComposing || e.keyCode === 229) return;
+  if (e.key === "Escape") { cancelPin(); return; }
+  if (e.key === "Enter" && !e.shiftKey && !TOUCH) { e.preventDefault(); commit(); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && pending && document.activeElement !== box && document.activeElement !== $("inkText")) cancelPin(); });
+
+// ---- 描く（ペン・矢印・四角・丸・文字／黄・赤・白）。位置はページの px で持つ（SVG なので長い写真でも重くならない）
+const COLORS = { y: "#f2d33a", r: "#ff3b3b", w: "#ffffff" }, CNAME = { y: "黄", r: "赤", w: "白" };
+const KIND = { p: "線", a: "矢印", r: "四角", o: "丸", t: "文字" };
+let tool = "a", color = "r", drawOn = false, live = null, textAt = null;   // ホームページは白地が多いので、はじめの色は赤
+function showDraw(on) {
+  drawOn = on; $("draw").hidden = !on; $("drawOpen").classList.toggle("on", on); $("drawOpen").setAttribute("aria-pressed", String(on));
+  $("drawOpen").querySelector("span").textContent = on ? "描き終わる" : "描く";
+  ink.classList.toggle("on", on); document.body.classList.toggle("drawing", on);
+  if (!on) closeText(true);
+}
+$("drawOpen").onclick = () => { showDraw(!drawOn); if (drawOn && TOUCH) box.blur(); if (NARROW()) setTimeout(keepPinVisible, 80); };
+function markBar() {
+  document.querySelectorAll("[data-tool]").forEach(b => b.classList.toggle("on", b.dataset.tool === tool));
+  document.querySelectorAll("[data-color]").forEach(b => b.classList.toggle("on", b.dataset.color === color));
+}
+document.querySelectorAll("[data-tool]").forEach(b => b.onclick = () => { tool = b.dataset.tool; markBar(); });
+document.querySelectorAll("[data-color]").forEach(b => b.onclick = () => { color = b.dataset.color; markBar(); });
+$("undo").onclick = () => { shapes.pop(); drawAll(); refresh(); };
+markBar();
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, at) { const e = document.createElementNS(NS, tag); for (const k in at) e.setAttribute(k, at[k]); return e; }
+function scaleK() { const s = shotOf(); return s ? s.w / (shot.clientWidth || s.w) : 1; }    // 画面の 1px がページの何 px か
+function shapeEls(sh, faded) {
+  const k = scaleK(), lw = 3.5 * k, c = COLORS[sh.c] || COLORS.r, g = el("g", { opacity: faded ? .55 : 1 });
+  const p0 = sh.pts[0], p1 = sh.pts[sh.pts.length - 1];
+  const both = (make) => { const a = make(); a.setAttribute("stroke", "rgba(0,0,0,.55)"); a.setAttribute("stroke-width", lw + 3 * k); g.append(a);
+                           const b = make(); b.setAttribute("stroke", c); b.setAttribute("stroke-width", lw); g.append(b); };
+  const base = { fill: "none", "stroke-linecap": "round", "stroke-linejoin": "round" };
+  if (sh.k === "p") both(() => el("polyline", Object.assign({ points: sh.pts.map(q => q.join(",")).join(" ") }, base)));
+  else if (sh.k === "r") both(() => el("rect", Object.assign({ x: Math.min(p0[0], p1[0]), y: Math.min(p0[1], p1[1]), width: Math.abs(p1[0] - p0[0]), height: Math.abs(p1[1] - p0[1]) }, base)));
+  else if (sh.k === "o") both(() => el("ellipse", Object.assign({ cx: (p0[0] + p1[0]) / 2, cy: (p0[1] + p1[1]) / 2, rx: Math.abs(p1[0] - p0[0]) / 2, ry: Math.abs(p1[1] - p0[1]) / 2 }, base)));
+  else if (sh.k === "a") {
+    const an = Math.atan2(p1[1] - p0[1], p1[0] - p0[0]), hl = 16 * k;
+    both(() => el("line", Object.assign({ x1: p0[0], y1: p0[1], x2: p1[0] - hl * .6 * Math.cos(an), y2: p1[1] - hl * .6 * Math.sin(an) }, base)));
+    const pts = [p1, [p1[0] - hl * Math.cos(an - .45), p1[1] - hl * Math.sin(an - .45)], [p1[0] - hl * Math.cos(an + .45), p1[1] - hl * Math.sin(an + .45)]].map(q => q.join(",")).join(" ");
+    g.append(el("polygon", { points: pts, fill: c, stroke: "rgba(0,0,0,.55)", "stroke-width": 1.5 * k, "stroke-linejoin": "round" }));
+  }
+  else if (sh.k === "t") {
+    const t = el("text", { x: p0[0], y: p0[1], fill: c, stroke: "rgba(0,0,0,.85)", "stroke-width": 4 * k, "paint-order": "stroke", "font-size": 20 * k, "font-weight": 800,
+                           "dominant-baseline": "hanging", "font-family": "Hiragino Sans, Noto Sans JP, Meiryo, sans-serif" });
+    t.textContent = sh.s; g.append(t);
+  }
+  return g;
+}
+function drawAll() {                // 描き込みとピンを、今の画面（PC／スマホ）の分だけ出す
+  ink.innerHTML = ""; const pins = $("pins"); pins.innerHTML = "";
+  if (!PAGE) return;
+  const s = shotOf();
+  items.forEach((it, i) => {
+    if (it.dev !== dev) return;
+    (it.d || []).forEach(sh => ink.append(shapeEls(sh, pending && !drawOn ? false : false)));
+    const b = document.createElement("button"); b.className = "pin" + (selN === i + 1 ? " sel" : ""); b.textContent = i + 1;
+    b.style.left = it.x / s.w * 100 + "%"; b.style.top = it.y / s.h * 100 + "%"; b.setAttribute("aria-label", numStr(i + 1) + " のコメントを見る");
+    b.onclick = e => { e.stopPropagation(); selectItem(i + 1, false); };
+    pins.append(b);
+  });
+  shapes.forEach(sh => ink.append(shapeEls(sh)));
+  if (live) ink.append(shapeEls(live));
+  if (pending && pending.dev === dev) {
+    const b = document.createElement("button"); b.className = "pin new"; b.textContent = items.length + 1; b.tabIndex = -1;
+    b.style.left = pending.x / s.w * 100 + "%"; b.style.top = pending.y / s.h * 100 + "%"; b.setAttribute("aria-label", "いま書いているコメントの場所");
+    b.onclick = e => e.stopPropagation(); pins.append(b);
+  }
+}
+new ResizeObserver(() => drawAll()).observe(shot);
+function simplify(pts, eps) {      // 線の点を減らす（形は保つ）
+  if (pts.length < 3) return pts;
+  const keep = new Uint8Array(pts.length); keep[0] = keep[pts.length - 1] = 1; const st = [[0, pts.length - 1]];
+  while (st.length) {
+    const [i, j] = st.pop(), [ax, ay] = pts[i], [bx, by] = pts[j], L = Math.hypot(bx - ax, by - ay) || 1e-9; let m = -1, md = eps;
+    for (let k = i + 1; k < j; k++) { const d = Math.abs((bx - ax) * (ay - pts[k][1]) - (ax - pts[k][0]) * (by - ay)) / L; if (d > md) { md = d; m = k; } }
+    if (m > 0) { keep[m] = 1; st.push([i, m], [m, j]); }
+  }
+  return pts.filter((_, k) => keep[k]);
+}
+function roundShape(sh) { const o = { k: sh.k, c: sh.c, pts: sh.pts.map(q => [Math.round(q[0]), Math.round(q[1])]) }; if (sh.s) o.s = sh.s; return o; }
+function inkDesc(d) {               // コピーする文の描き込み行（位置はページの左上からの px：横,縦）
+  const P2 = q => Math.round(q[0]) + "," + Math.round(q[1]);
+  return d.map(sh => { const h = KIND[sh.k] + "(" + CNAME[sh.c] + ") ";
+    if (sh.k === "p") return h + sh.pts.map(P2).join(" ");
+    if (sh.k === "t") return h + P2(sh.pts[0]) + "「" + sh.s + "」";
+    return h + P2(sh.pts[0]) + "→" + P2(sh.pts[sh.pts.length - 1]); }).join(" / ");
+}
+ink.addEventListener("pointerdown", e => {
+  if (!drawOn || !pending) return; e.preventDefault();
+  const q = toPage(e);
+  if (tool === "t") { openText(q, e); return; }
+  ink.setPointerCapture(e.pointerId); live = { k: tool, c: color, pts: tool === "p" ? [q] : [q, q] };
+});
+ink.addEventListener("pointermove", e => { if (!live) return; const q = toPage(e); if (live.k === "p") live.pts.push(q); else live.pts[1] = q; drawAll(); });
+function endStroke() {
+  if (!live) return; const sh = live; live = null;
+  if (sh.k === "p") sh.pts = simplify(sh.pts, 1.2 * scaleK());
+  const a = sh.pts[0], b = sh.pts[sh.pts.length - 1];
+  if (sh.k === "p" ? sh.pts.length > 1 : Math.hypot(b[0] - a[0], b[1] - a[1]) > 8 * scaleK()) shapes.push(sh);
+  drawAll(); refresh();
+}
+ink.addEventListener("pointerup", endStroke); ink.addEventListener("pointercancel", () => { live = null; drawAll(); });
+const inkText = $("inkText");
+function openText(q, e) {
+  closeText(true); textAt = q;
+  const r = shot.getBoundingClientRect();
+  inkText.style.left = Math.min(e.clientX - r.left, r.width - 170) + "px"; inkText.style.top = (e.clientY - r.top) + "px";
+  inkText.value = ""; inkText.hidden = false; setTimeout(() => inkText.focus(), 0);
+}
+function closeText(keep) {
+  if (inkText.hidden) return;
+  const v = inkText.value.trim(); inkText.hidden = true;
+  if (keep && v && textAt && pending) { shapes.push({ k: "t", c: color, pts: [textAt], s: v }); drawAll(); refresh(); }
+  textAt = null;
+}
+inkText.addEventListener("keydown", e => {
+  if (e.isComposing) return; e.stopPropagation();
+  if (e.key === "Enter") { e.preventDefault(); closeText(true); }
+  else if (e.key === "Escape") { inkText.value = ""; closeText(false); }
+});
+inkText.addEventListener("blur", () => closeText(true));
+inkText.addEventListener("click", e => e.stopPropagation());
+
+// ---- 声で入れる（Vcheckくんと同じ。ブラウザの音声認識：Chrome・Edge・Safari・スマホ。Brave は使えない）
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let rec = null, listening = false, micBase = "", micBox = null, micBtn = null, micWant = false, micT0 = 0, micLast = 0, micTimer = null;
+const MIC_QUIET = 12000, MIC_MAX = 180000;   // 黙ったまま12秒、または全部で3分で止める
+if (SR && !navigator.brave) { $("mic").hidden = false; $("ovMic").hidden = false; }
+function micLabel(b, on) { const s = b.querySelector("span"); if (s) s.textContent = on ? "止める" : "声で入れる"; else b.lastChild.textContent = on ? "止める" : "声で入れる"; b.classList.toggle("on", on); }
+function micStop() { listening = false; micLabel($("mic"), false); micLabel($("ovMic"), false); box.placeholder = "例：この文字をもっと大きく"; }
+function micStart() {
+  // Android の Chrome は continuous だと結果ごとに「それまでの全文」を返し、同じ言葉が重なる。Android だけ一言ずつ聞いて、切れたら聞き直す
+  rec = new SR(); rec.lang = "ja-JP"; rec.interimResults = true; rec.continuous = !/Android/i.test(navigator.userAgent); rec.maxAlternatives = 1;
+  micBase = micBox.value ? micBox.value.replace(/\s+$/, "") + " " : "";
+  rec.onresult = e => {
+    let fin = "", mid = "";
+    for (let i = 0; i < e.results.length; i++) { const r = e.results[i]; (r.isFinal ? (fin += r[0].transcript) : (mid += r[0].transcript)); }
+    micBox.value = (micBase + fin + mid).trim(); micLast = Date.now(); micBox.dispatchEvent(new Event("input"));
+  };
+  rec.onerror = e => {
+    if (e.error === "no-speech" || e.error === "aborted") return;
+    micWant = false;
+    const why = { "not-allowed": "マイクを使う許可が必要です（ブラウザの許可を確かめてください）", "service-not-allowed": "マイクを使う許可が必要です",
+                  "audio-capture": "マイクが見つかりません", "network": "このブラウザでは声の入力が使えません。Chrome か Safari で開いてください" }[e.error] || ("声の入力が止まりました（" + e.error + "）");
+    toast(why, 3200);
+    if (e.error === "network" || e.error === "service-not-allowed") { $("mic").hidden = true; $("ovMic").hidden = true; }
+  };
+  rec.onend = () => {
+    if (micWant && Date.now() - micLast < MIC_QUIET && Date.now() - micT0 < MIC_MAX) { try { micStart(); return; } catch (err) {} }
+    micWant = false; clearInterval(micTimer); micStop(); if (micBox === box && box.value.trim()) toast("内容を確かめて「追加」を押してください");
+  };
+  rec.start();
+}
+function startMic(btn, target) {
+  if (listening && rec) { micWant = false; rec.stop(); return; }
+  micBox = target; micBtn = btn;
+  try {
+    micWant = true; micT0 = micLast = Date.now(); micStart();
+    listening = true; micLabel(btn, true); target.placeholder = "話してください…（終わったら「止める」）";
+    clearInterval(micTimer); micTimer = setInterval(() => { if (micWant && (Date.now() - micLast > MIC_QUIET || Date.now() - micT0 > MIC_MAX)) { micWant = false; try { rec.stop(); } catch (e) {} } }, 1000);
+  } catch (err) { micWant = false; micStop(); toast("声の入力を始められませんでした"); }
+}
+$("mic").onclick = () => startMic($("mic"), box);
+$("ovMic").onclick = () => startMic($("ovMic"), $("ov"));
+
+// ---- 画像（受け取り口がある時だけ。ページで縮めてから持つ）と全体へのコメント
+const ov = $("ov"), pick = $("pick");
+ov.value = overall.text || "";
+ov.addEventListener("input", () => { overall.text = ov.value; saveOverall(); updState(); });
+async function shrink(file) {
+  const img = await createImageBitmap(file), k = Math.min(1, 1280 / Math.max(img.width, img.height));
+  const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+  c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c.toDataURL("image/jpeg", 0.8);
+}
+function thumbs(elm, arr, onDel) { elm.innerHTML = ""; arr.forEach((u, i) => { const im = document.createElement("img"); im.src = u; im.alt = "付けた画像（押すと外す）"; im.title = "押すと外す"; im.onclick = () => onDel(i); elm.append(im); }); }
+function showPend() { thumbs($("pendThumbs"), pendImgs, i => { pendImgs.splice(i, 1); showPend(); refresh(); }); }
+function showOv() { thumbs($("ovthumbs"), overall.images, i => { overall.images.splice(i, 1); saveOverall(); showOv(); updState(); }); }
+let pickFor = "entry";
+async function addImages(files, where) {
+  let n = 0;
+  for (const f of files) {
+    if (!f.type.startsWith("image/")) continue;
+    const u = await shrink(f); n++;
+    if (where === "overall") { overall.images.push(u); saveOverall(); showOv(); updState(); }
+    else if (pending) { pendImgs.push(u); showPend(); refresh(); }
+  }
+  if (n) toast("画像を付けました");
+}
+$("att").onclick = () => { pickFor = "entry"; pick.click(); };
+$("ovatt").onclick = () => { pickFor = "overall"; pick.click(); };
+pick.onchange = () => { addImages([...pick.files], pickFor); pick.value = ""; };
+showOv();
+
+// ---- 届け方：レビュー完了（受け取り口へ）／コメントを全てコピー
+const sendBtn = $("send"), copyBtn = $("copy");
+const SV_SEND = '<svg class="i" viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5z"/></svg>', SV_COPY = '<svg class="i" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>';
+if (RECEIVER) { sendBtn.hidden = false; $("att").hidden = false; $("ovatt").hidden = false; $("fbArea").hidden = false; }
+else { copyBtn.classList.remove("line"); copyBtn.classList.add("done"); $("flow3").textContent = "終わったら「コメントを全てコピー」して送る"; }
+document.querySelectorAll(".rlabel").forEach(e => e.textContent = RECEIVER ? "レビュー完了" : "全てコピー");
+document.querySelectorAll(".ricon").forEach(e => e.innerHTML = RECEIVER ? SV_SEND : SV_COPY);
+$("topReturn").onclick = $("mReturn").onclick = () => (RECEIVER ? sendBtn : copyBtn).click();
+function ovPending() { return (overall.text || overall.images.length) && (overall.text !== overall.sentText || overall.images.length !== overall.sentN) ? 1 : 0; }
+function unsentCount() { return items.filter(it => !it.sent).length + ovPending(); }
+function updState() {
+  const el = $("saveState"), unsent = unsentCount(), any = items.length || (overall.text || "").trim();
+  document.querySelectorAll(".unsentN").forEach(n => { n.hidden = !RECEIVER || !unsent; n.textContent = unsent; });
+  $("allN").textContent = items.length;
+  el.hidden = !any; if (!any) return;
+  if (!saveOK) { el.className = "state unsent"; el.textContent = "このブラウザに保存できませんでした。閉じる前に送ってください。"; return; }
+  if (RECEIVER && !unsent) { el.className = "state done"; el.textContent = "✓ すべて届きました"; return; }
+  el.className = "state unsent";
+  el.textContent = RECEIVER ? "まだ届いていないもの " + unsent + " 件（「レビュー完了」で届きます）" : "このブラウザに残っています。「コメントを全てコピー」して、メッセージで送ってください";
+}
+function showResult(ok, msg) { const r = $("result"); r.hidden = false; r.className = "result " + (ok ? "ok" : "ng"); r.textContent = msg; toast(msg, 3000); }
+function payloadItem(it, i) {       // 受け取り口（Vcheckくんと同じ）の形：t＝番号、tc＝「PC ①」、sec＝場所
+  const n = i + 1;
+  return { t: n, tc: (it.dev === "pc" ? "PC " : "スマホ ") + numStr(n), sec: whereText(it), text: it.text, ink: it.d ? inkDesc(it.d) : "", images: it.images || [] };
+}
+sendBtn.onclick = async () => {
+  const todo = items.map((it, i) => [it, i]).filter(([it]) => !it.sent), ovNew = !!ovPending();
+  if (!todo.length && !ovNew) { showResult(true, items.length ? "送るものはありません（すべて届いています）" : "まだコメントがありません"); return; }
+  sendBtn.disabled = true; sendBtn.querySelector(".lbl").textContent = "送っています…";
+  const body = { video: "hp-" + PID, title: PAGE ? PAGE.title : PID, name: nameEl.value.trim(),
+    overall: ovNew ? { text: overall.text, images: overall.images } : null, items: todo.map(([it, i]) => payloadItem(it, i)) };
+  try {
+    const r = await fetch(RECEIVER, { method: "POST", body: JSON.stringify(body) }), j = await r.json();
+    if (!j.ok) throw new Error("ng");
+    todo.forEach(([it]) => it.sent = true); save();
+    if (ovNew) { overall.sentText = overall.text; overall.sentN = overall.images.length; saveOverall(); }
+    render(); showResult(true, "レビュー完了。" + (todo.length + (ovNew ? 1 : 0)) + " 件が作り手に届きました。ありがとうございました。");
+  } catch (e) { showResult(false, "送れませんでした。電波を確かめて、もう一度「レビュー完了」を押してください（コメントは残っています）。"); }
+  sendBtn.disabled = false; sendBtn.querySelector(".lbl").textContent = "レビュー完了";
+};
+function asText() {
+  const who = nameEl.value.trim(), ovt = (overall.text || "").trim();
+  const head = ["【" + (PAGE ? PAGE.title : PID) + "】確認コメント " + items.length + "件" + (who ? "（" + who + "）" : ""), PAGE ? PAGE.url + "（" + PAGE.made + " の画面）" : ""].filter(Boolean);
+  const top = ovt || overall.images.length ? ["【全体】", ovt + (overall.images.length ? "（画像 " + overall.images.length + " 枚）" : ""), "ーーーーー"] : [];
+  const lines = items.map((it, i) => numStr(i + 1) + " " + DEVNAME[it.dev] + "・" + whereText(it) + "\n　" + it.text.replace(/\n/g, "\n　") +
+    (it.images && it.images.length ? "　（画像 " + it.images.length + " 枚）" : "") + (it.d ? "\n　✎ " + inkDesc(it.d) : ""));
+  return head.concat(top, lines).join("\n");
+}
+async function copyText(txt) {
+  try { if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(txt); return true; } } catch (e) {}
+  try {
+    const ta = document.createElement("textarea"); ta.value = txt; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0;";
+    document.body.append(ta); ta.select(); ta.setSelectionRange(0, txt.length); const ok = document.execCommand("copy"); ta.remove(); return !!ok;
+  } catch (e) { return false; }
+}
+copyBtn.onclick = async () => {
+  if (!items.length && !(overall.text || "").trim()) { openList(); showResult(false, "まだコピーするコメントがありません"); return; }
+  const txt = asText(), cb = $("copyBox");
+  if (await copyText(txt)) { cb.hidden = true; showResult(true, "コピーしました。メッセージに貼り付けて送ってください"); }
+  else { openList(); cb.value = txt; cb.hidden = false; showResult(false, "コピーできませんでした。下の枠の文を長押しで全部選んで、コピーしてください"); cb.focus(); cb.select(); }
+};
+$("share").onclick = async () => toast(await copyText(location.href) ? "このページのリンクをコピーしました" : "コピーできませんでした。アドレス欄からコピーしてください", 2600);
+let armed = false;
+$("clear").onclick = e => {           // 2回押しで消す（ブラウザの確認画面は使わない）
+  const b = e.currentTarget;
+  if (!armed) { armed = true; b.textContent = "もう一度押すと消えます"; setTimeout(() => { armed = false; b.textContent = "全部消す"; }, 3000); return; }
+  items = []; save(); overall = { text: "", images: [], sentText: null, sentN: 0 }; ov.value = ""; saveOverall(); showOv();
+  armed = false; b.textContent = "全部消す"; selN = 0; render(); toast("コメントを全部消しました");
+};
+
+// ---- 一覧（番号を押すとその場所へ。「編集」「削除」）
+function selectItem(n, fromList) {
+  const it = items[n - 1]; if (!it) return;
+  selN = n;
+  if (it.dev !== dev) setDev(it.dev);
+  render();
+  const go = () => {
+    const s = shotOf(), r = shot.getBoundingClientRect(), head = document.querySelector(".top").offsetHeight;
+    scrollTo({ top: Math.max(0, scrollY + r.top + it.y / s.h * r.height - head - (innerHeight - head) * 0.35), behavior: "smooth" });
+  };
+  if (fromList) { closeList(); setTimeout(go, 60); }
+  else {
+    if (NARROW()) openList();
+    const li = list.querySelector('[data-n="' + n + '"]'); if (li) li.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }
+}
+const list = $("list");
+function render() {
+  list.innerHTML = "";
+  $("count").textContent = items.length ? items.length + " 件" : "";
+  $("empty").hidden = !!items.length;
+  items.forEach((it, i) => {
+    const n = i + 1, li = document.createElement("li"); li.dataset.n = n; if (selN === n) li.className = "sel";
+    const nb = document.createElement("button"); nb.className = "num"; nb.textContent = n; nb.title = "この場所を見る"; nb.setAttribute("aria-label", numStr(n) + " の場所を見る");
+    nb.onclick = () => selectItem(n, true);
+    const c = document.createElement("div"); c.className = "ctext"; c.textContent = it.text;
+    const bd = document.createElement("div"); bd.className = "badges";
+    const badge = (t, cls) => { const s = document.createElement("span"); s.className = "badge" + (cls ? " " + cls : ""); s.textContent = t; bd.append(s); };
+    badge(DEVNAME[it.dev]);
+    if (it.d) badge("描き込み");
+    if (it.images && it.images.length) badge("画像 " + it.images.length);
+    if (RECEIVER) badge(it.sent ? "✓ 届いた" : "まだ", it.sent ? "ok" : "wait");
+    const acts = document.createElement("div"); acts.className = "acts";
+    const ed = document.createElement("button"); ed.className = "btn quiet"; ed.textContent = "編集";
+    const del = document.createElement("button"); del.className = "btn danger"; del.textContent = "削除";
+    del.onclick = () => { items.splice(i, 1); save(); selN = 0; render(); toast("削除しました"); };
+    ed.onclick = () => {
+      const w = document.createElement("div"); w.className = "edit";
+      const ta = document.createElement("textarea"); ta.value = it.text; ta.setAttribute("aria-label", "コメントを編集");
+      const row = document.createElement("div"); row.className = "acts"; row.style.marginTop = "6px";
+      const ok = document.createElement("button"); ok.className = "btn line"; ok.textContent = "保存";
+      const no = document.createElement("button"); no.className = "btn quiet"; no.textContent = "やめる";
+      row.append(no, ok); w.append(ta, row); c.hidden = true; acts.hidden = true; li.append(w); ta.focus();
+      no.onclick = () => render();
+      ok.onclick = () => { const nt = ta.value.trim(); if (!nt) { toast("空にはできません。消す時は「削除」"); return; }
+        if (nt !== it.text) { it.text = nt; it.sent = false; save(); toast("直しました"); } render(); };
+    };
+    acts.append(ed, del);
+    li.append(nb, c, bd, acts); list.append(li);
+  });
+  drawAll(); updState();
+}
+
+// ---- スマホ：一覧は下から出す
+function openList() { if (!NARROW()) return; if (pending) cancelPin(); document.body.classList.add("listopen"); $("scrim").hidden = false; }
+function closeList() { document.body.classList.remove("listopen"); $("scrim").hidden = true; }
+$("openList").onclick = openList;
+$("panelClose").onclick = closeList;
+$("scrim").onclick = () => { if (document.body.classList.contains("listopen")) closeList(); };
+$("logo").onclick = e => { e.preventDefault(); scrollTo({ top: 0, behavior: "smooth" }); };
+
+// ---- ホームページチェックくんへの要望（同じ受け取り口に「hpcheck-request」で届く）
+$("fbSend").onclick = async () => {
+  const t = $("fbText").value.trim(), b = $("fbSend"), r = $("fbResult");
+  if (!t) { toast("要望を書いてください"); $("fbText").focus(); return; }
+  b.disabled = true; b.textContent = "送っています…";
+  const body = { video: FEEDBACK_ID, title: "ホームページチェックくんへの要望", name: nameEl.value.trim(),
+    overall: { text: t + "\n（見ていたページ：" + (PAGE ? PAGE.title : PID) + "／" + DEVNAME[dev] + "の画面／" + (TOUCH ? "スマホ・タブレット" : "パソコン") + "／v" + VER + "）", images: [] }, items: [] };
+  try { const res = await fetch(RECEIVER, { method: "POST", body: JSON.stringify(body) }), j = await res.json(); if (!j.ok) throw 0;
+    $("fbText").value = ""; r.hidden = false; r.className = "result ok"; r.textContent = "送りました。ありがとうございます"; }
+  catch (e) { r.hidden = false; r.className = "result ng"; r.textContent = "送れませんでした。もう一度押してください"; }
+  b.disabled = false; b.textContent = "送る";
+};
+render();
+</script>
+</body>
+</html>
