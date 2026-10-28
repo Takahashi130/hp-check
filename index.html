@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#FFFFFF">
-<title>ホームページチェックくん</title>
+<title>Webチェックくん</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@800&text=%E3%81%8F%E3%82%93&display=swap" rel="stylesheet">
 <style>
-/* ホームページチェックくん（v0.1.0）：Vcheckくんと同じ作り。白を土台にティール #029AAA、イエロー #E5E647 は強調だけ。
+/* Webチェックくん（v0.1.0）：Vcheckくんと同じ作り。白を土台にティール #029AAA、イエロー #E5E647 は強調だけ。
    コンセプトは「70歳の方でも使える」：ボタンは大きく、手順は3つ、説明は最小限。 */
 :root {
   --teal:#029AAA; --teal-ink:#027A87; --teal-deep:#01646F; --navy:#06304F; --yellow:#E5E647;
@@ -72,6 +72,12 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
 .flow li { display:flex; align-items:center; gap:12px; border:1px solid var(--line); border-radius:14px; padding:12px 14px; background:var(--bg2); line-height:1.4; }
 .flow b { flex:none; display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:var(--teal-ink); color:#fff; font-size:17px; }
 
+/* ページの切り替え（複数ページの時だけ） */
+.ptabs { display:flex; gap:8px; flex-wrap:wrap; position:sticky; top:var(--headH); z-index:20; background:rgba(255,255,255,.97); padding:8px 0; }
+.ptabs button { display:inline-flex; align-items:center; gap:8px; min-height:52px; padding:4px 18px 4px 6px; border-radius:999px; border:2px solid var(--line); background:#fff; font-weight:800; font-size:17px; color:var(--ink); }
+.ptabs button .pno { display:grid; place-items:center; width:36px; height:36px; border-radius:50%; background:var(--bg2); color:var(--sub); font-size:15px; }
+.ptabs button[aria-pressed="true"] { border-color:var(--teal-ink); background:var(--tint); color:var(--teal-deep); }
+.ptabs button[aria-pressed="true"] .pno { background:var(--teal-ink); color:#fff; }
 /* 画面写真 */
 .stage { background:var(--bg2); border:1px solid var(--line); border-radius:14px; padding:18px; display:flex; justify-content:center; }
 .stage.sp { padding:24px 18px; }
@@ -120,6 +126,26 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
 .thumbs:empty { display:none; }
 .thumbs img { height:48px; border-radius:6px; border:1px solid var(--line); cursor:pointer; }
 
+/* 画像・色・参考URL（個別のコメントと全体へのコメントの両方） */
+.extras:empty { display:none; }
+.urlrow { display:flex; flex-direction:column; gap:4px; margin-top:10px; font-size:14px; font-weight:800; color:var(--ink); }
+.urlrow input { font-size:17px; padding:10px 12px; border:2px solid var(--line); border-radius:12px; min-height:52px; width:100%; }
+.urlrow input:focus { border-color:var(--teal-ink); outline:none; }
+.cpanel { border:1px solid var(--line); border-radius:12px; padding:10px; margin-top:10px; background:var(--bg2); display:flex; flex-direction:column; gap:8px; }
+.cpanel .crow2 { display:flex; gap:8px; align-items:center; }
+.cpanel input[type=color] { width:64px; height:52px; padding:2px; border:2px solid var(--line); border-radius:12px; background:#fff; flex:none; cursor:pointer; }
+.cpanel .crow2 .btn { flex:1; }
+.cpanel .note { margin:0; font-size:13px; color:var(--sub); }
+.xchips { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.xchips:empty { display:none; }
+.xchip { display:inline-flex; align-items:center; gap:6px; min-height:40px; padding:2px 6px 2px 4px; border-radius:999px; border:1.5px solid var(--line); background:#fff; font-size:14px; font-weight:800; font-variant-numeric:tabular-nums; }
+.xchip i { width:28px; height:28px; border-radius:50%; border:1px solid rgba(0,0,0,.2); display:inline-block; }
+.xchip button { border:none; background:none; width:30px; height:30px; border-radius:50%; color:var(--sub); font-size:16px; padding:0; }
+.xchip button:hover { background:var(--bg2); }
+.tools .btn.on { background:var(--tint); border-color:var(--teal-ink); color:var(--teal-deep); }
+body.picking .shot { cursor:copy; outline:4px dashed var(--yellow); outline-offset:-4px; }
+.sw { display:inline-block; width:14px; height:14px; border-radius:50%; border:1px solid rgba(0,0,0,.25); vertical-align:-2px; margin-right:4px; }
+.badge a { color:var(--teal-ink); }
 .listhead { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
 .listhead h2 { margin:0; }
 .listhead span { color:var(--sub); font-size:14px; font-weight:700; }
@@ -177,6 +203,9 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
   .wrap { display:block; padding:10px 0 calc(96px + env(safe-area-inset-bottom, 0px)); }
   .main { gap:10px; }
   .info, .flow { margin:0 12px; }
+  .ptabs { flex-wrap:nowrap; overflow-x:auto; padding:8px 12px; scrollbar-width:none; border-bottom:1px solid var(--line); }
+  .ptabs::-webkit-scrollbar { display:none; }
+  .ptabs button { flex:none; min-height:48px; font-size:16px; }
   .info h1 { font-size:18px; }
   .flow { grid-template-columns:1fr; gap:6px; }
   .flow li { padding:8px 12px; font-size:15px; }
@@ -190,7 +219,7 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
     box-shadow:0 -8px 30px rgba(6,48,79,.25); padding:14px 14px calc(14px + env(safe-area-inset-bottom, 0px)); background:#fff; }
   .composer.sheet { display:none; }
   body.composing .composer.sheet { display:block; }
-  body.composing.drawing #box, body.composing.drawing #mic, body.composing.drawing #att { display:none !important; }   /* 描く間は写真を広く。「描き終わる」は残す */
+  body.composing.drawing #box, body.composing.drawing #mic, body.composing.drawing #cAtt, body.composing.drawing #cColor, body.composing.drawing #cUrlBtn, body.composing.drawing #cExtras { display:none !important; }   /* 描く間は写真を広く。「描き終わる」は残す */
   #panel { display:none; }
   body.listopen #panel { display:flex; flex-direction:column; gap:12px; background:var(--bg2); }
   .sheethead { display:flex; align-items:center; justify-content:space-between; gap:8px; position:sticky; top:-14px; z-index:2; background:var(--bg2); margin:-14px -14px 0; padding:12px 14px; border-radius:20px 20px 0 0; }
@@ -210,7 +239,7 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
 </head>
 <body>
 <header class="top">
-  <a class="logo" href="#" id="logo" aria-label="ホームページチェックくん"><b>HP<i></i>check</b><span class="kun">くん</span></a>
+  <a class="logo" href="#" id="logo" aria-label="Webチェックくん"><b>Web<i></i>check</b><span class="kun">くん</span></a>
   <div class="seg" role="group" aria-label="見る画面">
     <button id="devPc" data-dev="pc" aria-pressed="true"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M8.5 20h7M12 16.5V20"/></svg>パソコン</button>
     <button id="devSp" data-dev="sp" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>スマホ</button>
@@ -220,15 +249,11 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
 <div class="scrim" id="scrim" hidden></div>
 <div class="wrap">
   <main class="main">
+    <nav class="ptabs" id="pageTabs" aria-label="確認するページ" hidden></nav>
     <section class="info">
       <h1 id="ttl">（ページを読み込み中）</h1>
       <p class="meta" id="meta"></p>
     </section>
-    <ol class="flow">
-      <li><b>1</b><span>気になる所を押す</span></li>
-      <li><b>2</b><span>一言書いて（声でも）「追加」</span></li>
-      <li><b>3</b><span id="flow3">終わったら「レビュー完了」</span></li>
-    </ol>
     <div class="stage" id="stage">
       <div class="shot" id="shot">
         <p class="loading" id="loading">画面を読み込んでいます…</p>
@@ -249,9 +274,11 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
         <div class="tools">
           <button class="btn" id="mic" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg><span>声で入れる</span></button>
           <button class="btn" id="drawOpen" aria-pressed="false"><svg class="i" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg><span>描く</span></button>
-          <button class="btn" id="att" hidden><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg><span>画像</span></button>
+          <button class="btn" id="cAtt"><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg><span>画像</span></button>
+          <button class="btn" id="cColor" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.1 0 1.6-.8 1.6-1.6 0-1.2-1-1.5-1-2.6 0-.9.7-1.5 1.6-1.5H16a5 5 0 005-5C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>色</span></button>
+          <button class="btn" id="cUrlBtn" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg><span>参考URL</span></button>
         </div>
-        <div class="thumbs" id="pendThumbs"></div>
+        <div class="extras" id="cExtras"></div>
         <div class="draw" id="draw" hidden>
           <div class="row">
             <button class="btn" data-tool="p"><svg class="i" viewBox="0 0 24 24"><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>ペン</button>
@@ -286,8 +313,10 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
       <div class="card overall">
         <h2>全体へのコメント<span class="sub">場所が決まらないこと</span></h2>
         <textarea id="ov" placeholder="例：&#10;・全体的に文字を大きく&#10;・色をもう少し明るく"></textarea>
-        <div class="crow"><button class="btn sm quiet" id="ovMic" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg>声で入れる</button><button class="btn sm quiet" id="ovatt" hidden><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg>画像を付ける</button></div>
-        <div class="thumbs" id="ovthumbs"></div>
+        <div class="tools"><button class="btn" id="ovMic" hidden><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0014 0M12 18v3"/></svg><span>声で入れる</span></button><button class="btn" id="ovAtt"><svg class="i" viewBox="0 0 24 24"><path d="M21.4 11.1l-9.2 9.2a6 6 0 01-8.5-8.5l9.2-9.2a4 4 0 015.7 5.7l-9.2 9.2a2 2 0 01-2.8-2.8l8.5-8.5"/></svg><span>画像</span></button>
+          <button class="btn" id="ovColor" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.1 0 1.6-.8 1.6-1.6 0-1.2-1-1.5-1-2.6 0-.9.7-1.5 1.6-1.5H16a5 5 0 005-5C21 6.4 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15.5" cy="7.5" r="1.2"/></svg><span>色</span></button>
+          <button class="btn" id="ovUrlBtn" aria-expanded="false"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1"/></svg><span>参考URL</span></button></div>
+        <div class="extras" id="ovExtras"></div>
       </div>
       <div class="card">
         <label class="field"><span><b>お名前</b>（なくても大丈夫です）</span><input id="name" autocomplete="off" placeholder="例：山田"></label>
@@ -300,7 +329,7 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
         <p class="result" id="result" role="status" hidden></p>
         <textarea id="copyBox" readonly hidden aria-label="コピーする文"></textarea>
         <details class="fb" id="fbArea" hidden>
-          <summary>ホームページチェックくんへの要望・不具合</summary>
+          <summary>Webチェックくんへの要望・不具合</summary>
           <textarea id="fbText" placeholder="例：ボタンが小さくて押しにくい"></textarea>
           <div class="row"><button class="btn sm line" id="fbSend">送る</button></div>
           <p class="result" id="fbResult" hidden></p>
@@ -314,24 +343,29 @@ svg.i { width:24px; height:24px; flex:none; fill:none; stroke:currentColor; stro
   <button class="btn done" id="mReturn"><span class="ricon"></span><span class="rlabel">レビュー完了</span> <span class="cnt unsentN" hidden>0</span></button>
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<div class="ver">ホームページチェックくん v0.1.0</div>
+<div class="ver">Webチェックくん v0.2.0</div>
 <input type="file" id="pick" accept="image/*" multiple hidden>
 <script>
-// ホームページチェックくん（版は VER）。確認してもらうページの縦長の画面写真（PC・スマホ）に、押した所のピンと一言・描き込みを残す。
-// 使い方：index.html?p=<pages の下の名前>&to=<受け取り口の URL>。画面写真は 道具/shot.py で作る（pages/<名前>/pc.jpg・sp.jpg・page.js）。
+// Webチェックくん（版は VER）。確認してもらうページの縦長の画面写真（PC・スマホ）に、押した所のピンと一言・描き込みを残す。
+// 使い方：index.html?p=<pages の下の名前>（複数ページはカンマで：?p=top,about,price）&to=<受け取り口の URL>。画面写真は 道具/shot.py で作る（pages/<名前>/pc.jpg・sp.jpg・page.js）。
 // コメントは見た人のブラウザに残り、「レビュー完了」を押した時だけ受け取り口（Vcheckくんと同じ Google Apps Script）に届く。
-const VER = "0.1.0";
+const VER = "0.2.0";
 const Q = new URLSearchParams(location.search);
 const $ = id => document.getElementById(id);
-const PID = (Q.get("p") || "crifa-top").replace(/[^A-Za-z0-9_-]/g, "");   // 何も無い時は動作見本（クリファのトップ）
-const KEY = "hpcheck:" + PID;
+// 確認するページ（いくつでも）。何も無い時は動作見本（クリファのトップとポートフォリオ）
+const PIDS = [...new Set((Q.get("p") || "crifa-top,crifa-portfolio").split(",").map(x => x.trim().replace(/[^A-Za-z0-9_-]/g, "")).filter(Boolean))];
+let PID = PIDS[0];
+const KEY = "hpcheck:" + PIDS.join(",");
 const TOUCH = matchMedia("(pointer: coarse)").matches;
 const NARROW = () => innerWidth <= 1000;
 const RECEIVER = Q.get("to") || "";       // 受け取り口（このページを置いた人の Google）。無い時は「コメントを全てコピー」で返してもらう
-const FEEDBACK_ID = "hpcheck-request";
+const FEEDBACK_ID = "webcheck-request";
+const PAGES = {};
 let PAGE = null, dev = (TOUCH || NARROW()) ? "sp" : "pc";
-let items = [], overall = { text: "", images: [], sentText: null, sentN: 0 }, saveOK = true;
+const OV0 = () => ({ text: "", images: [], url: "", colors: [], sentSig: "" });
+let items = [], overall = OV0(), saveOK = true;
 try { items = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch (e) { items = []; }
+items.forEach(it => { if (!it.pg) it.pg = PIDS[0]; });
 try { overall = Object.assign(overall, JSON.parse(localStorage.getItem(KEY + ":overall") || "{}")); } catch (e) {}
 const nameEl = $("name");
 try { nameEl.value = localStorage.getItem("hpcheck:name") || ""; } catch (e) {}
@@ -343,32 +377,53 @@ function toast(m, ms) { const e = $("toast"); e.textContent = m; e.classList.add
 const DEVNAME = { pc: "パソコン", sp: "スマホ" };
 const CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳";
 const numStr = n => CIRC[n - 1] || "(" + n + ")";
-function shotOf(d) { return PAGE && PAGE.shots[d || dev]; }
+function shotOf(d, pg) { const P = pg ? PAGES[pg] : PAGE; return P && P.shots[d || dev]; }
+const labelOf = pg => (PAGES[pg] && (PAGES[pg].label || PAGES[pg].title)) || pg;
+const MULTI = PIDS.length > 1;
 function whereText(it) {          // 「上から 1234px（14%）・左から 40%」（ページの左上から。写真を撮った幅での px）
-  const s = shotOf(it.dev); if (!s) return "";
+  const s = shotOf(it.dev, it.pg); if (!s) return "";
   return "上から " + Math.round(it.y) + "px（" + Math.round(it.y / s.h * 100) + "%）・左から " + Math.round(it.x / s.w * 100) + "%";
 }
 
 // ---- ページ（画面写真）を読む：pages/<名前>/page.js（file:// で開いても読めるように script で読む）
-(function loadPage() {
-  const s = document.createElement("script"); s.src = "pages/" + PID + "/page.js?" + Date.now();
-  s.onload = () => { PAGE = (window.HP_PAGES || {})[PID]; if (!PAGE) return fail(); start(); };
-  s.onerror = fail; document.head.append(s);
-  function fail() { $("loading").textContent = "確認するページが見つかりません。送られてきたリンクをもう一度開いてください。"; $("ttl").textContent = "ページが見つかりません"; }
+(function loadPages() {
+  let left = PIDS.length;
+  PIDS.forEach(pg => {
+    const s = document.createElement("script"); s.src = "pages/" + pg + "/page.js?" + Date.now();
+    s.onload = s.onerror = () => { const P = (window.HP_PAGES || {})[pg]; if (P) PAGES[pg] = P; if (--left === 0) start(); };
+    document.head.append(s);
+  });
 })();
 function start() {
-  $("ttl").textContent = PAGE.title; document.title = PAGE.title + "｜ホームページチェックくん";
+  const ok = PIDS.filter(pg => PAGES[pg]);
+  if (!ok.length) { $("loading").textContent = "確認するページが見つかりません。送られてきたリンクをもう一度開いてください。"; $("ttl").textContent = "ページが見つかりません"; return; }
+  PIDS.splice(0, PIDS.length, ...ok);
+  const tabs = $("pageTabs"); tabs.innerHTML = ""; tabs.hidden = !MULTI;
+  PIDS.forEach((pg, i) => {
+    const b = document.createElement("button"); b.dataset.pg = pg; b.onclick = () => { if (pg !== PID) { setPage(pg); scrollTo({ top: 0 }); } };
+    b.innerHTML = '<span class="pno">' + (i + 1) + '</span>'; b.append(labelOf(pg)); const c = document.createElement("span"); c.className = "cnt"; c.hidden = true; b.append(c);
+    tabs.append(b);
+  });
+  setPage(PIDS.includes(PID) ? PID : PIDS[0]);
+}
+function setPage(pg) {
+  if (pending) cancelPin();
+  PID = pg; PAGE = PAGES[pg]; selN = 0;
+  $("ttl").textContent = PAGE.title; document.title = PAGE.title + "｜Webチェックくん";
   const m = $("meta"); m.innerHTML = "";
   const a = document.createElement("a"); a.href = PAGE.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = PAGE.url; m.append(a);
   const sp = document.createElement("span"); sp.textContent = PAGE.made + " の画面"; m.append(sp);
-  setDev(dev);
+  document.querySelectorAll("#pageTabs button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.pg === pg)));
+  setDev(dev); render();
 }
+function tabCounts() { document.querySelectorAll("#pageTabs button").forEach(b => { const n = items.filter(it => it.pg === b.dataset.pg).length, c = b.querySelector(".cnt"); c.hidden = !n; c.textContent = n + "件"; }); }
 function setDev(d) {
   dev = d;
   document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.dev === d)));
   $("stage").className = "stage " + d;
   if (!PAGE) return;
   if (pending && pending.dev !== d) cancelPin();
+  if (picking) stopPicking();
   const s = shotOf(), img = $("img");
   img.hidden = true; $("loading").hidden = false; $("loading").textContent = "画面を読み込んでいます…";
   img.onload = () => { img.hidden = false; $("loading").hidden = true; drawAll(); };
@@ -380,7 +435,9 @@ function setDev(d) {
 document.querySelectorAll(".seg button").forEach(b => b.onclick = () => { if (b.dataset.dev !== dev) { setDev(b.dataset.dev); scrollTo({ top: 0 }); } });
 
 // ---- ピン（押した所）と書く欄
-let pending = null, selN = 0, shapes = [], pendImgs = [];
+let pending = null, selN = 0, shapes = [];
+const D0 = () => ({ url: "", colors: [], images: [] });
+let draft = D0();          // 書いている途中のコメントの「画像・色・参考URL」
 const shot = $("shot"), box = $("box"), ink = $("ink");
 function toPage(e) {               // 押した所 → ページの座標（写真を撮った幅の px）
   const r = shot.getBoundingClientRect(), s = shotOf();
@@ -388,9 +445,10 @@ function toPage(e) {               // 押した所 → ページの座標（写�
 }
 shot.addEventListener("click", e => {
   if (!PAGE || $("img").hidden || drawOn || e.target.closest(".pin") || e.target === $("inkText")) return;
+  if (picking) { pickColor(e); return; }
   const [x, y] = toPage(e);
   if (pending) { pending.x = x; pending.y = y; }        // 書いている途中なら、ピンだけ動かす
-  else { pending = { dev, x, y }; shapes = []; pendImgs = []; showPend(); }
+  else { pending = { dev, x, y }; shapes = []; draft = D0(); showX("c"); }
   selN = 0; openComposer(); drawAll();
 });
 function openComposer() {
@@ -408,20 +466,22 @@ function keepPinVisible() {        // スマホ：下から出た欄にピンが
   const sheetTop = innerHeight - $("composer").offsetHeight, head = document.querySelector(".top").offsetHeight;
   if (py > sheetTop - 50 || py < head + 20) scrollTo({ top: scrollY + py - head - Math.max(80, (sheetTop - head) * 0.35), behavior: "smooth" });
 }
-function hasDraft() { return !!(box.value.trim() || shapes.length || pendImgs.length); }
+function hasDraft() { return !!(box.value.trim() || shapes.length || draft.images.length || draft.url.trim() || draft.colors.length); }
 function refresh() { $("add").disabled = !pending || !hasDraft(); }
 function cancelPin() {
   if (listening && rec) { micWant = false; try { rec.abort(); } catch (e) {} }
-  pending = null; shapes = []; pendImgs = []; box.value = ""; showPend(); showDraw(false); closeText(false);
+  pending = null; shapes = []; draft = D0(); box.value = ""; showX("c"); openX("c", null); stopPicking(); showDraw(false); closeText(false);
   $("idle").hidden = false; $("write").hidden = true; document.body.classList.remove("composing", "drawing"); box.blur(); drawAll();
 }
 function commit() {
   if (!pending) return;
-  const text = box.value.trim() || (shapes.length ? "（描き込み）" : "") || (pendImgs.length ? "（画像）" : "");
+  const text = box.value.trim() || (shapes.length ? "（描き込み）" : "") || (draft.images.length ? "（画像）" : "") || ((draft.url.trim() || draft.colors.length) ? "（参考・色）" : "");
   if (!text) { box.focus(); return; }
-  const it = { dev: pending.dev, x: Math.round(pending.x), y: Math.round(pending.y), text, at: Date.now() };
+  const it = { pg: PID, dev: pending.dev, x: Math.round(pending.x), y: Math.round(pending.y), text, at: Date.now() };
   if (shapes.length) it.d = shapes.map(roundShape);
-  if (pendImgs.length) it.images = pendImgs.slice();
+  if (draft.images.length) it.images = draft.images.slice();
+  if (draft.url.trim()) it.url = draft.url.trim();
+  if (draft.colors.length) it.colors = draft.colors.slice();
   items.push(it); save(); const n = items.length;
   cancelPin(); render();
   toast(saveOK ? numStr(n) + " を追加しました" : "追加しましたが、このブラウザに保存できませんでした", 2200);
@@ -485,7 +545,7 @@ function drawAll() {                // 描き込みとピンを、今の画面�
   if (!PAGE) return;
   const s = shotOf();
   items.forEach((it, i) => {
-    if (it.dev !== dev) return;
+    if (it.dev !== dev || it.pg !== PID) return;
     (it.d || []).forEach(sh => ink.append(shapeEls(sh, pending && !drawOn ? false : false)));
     const b = document.createElement("button"); b.className = "pin" + (selN === i + 1 ? " sel" : ""); b.textContent = i + 1;
     b.style.left = it.x / s.w * 100 + "%"; b.style.top = it.y / s.h * 100 + "%"; b.setAttribute("aria-label", numStr(i + 1) + " のコメントを見る");
@@ -597,46 +657,119 @@ function startMic(btn, target) {
 $("mic").onclick = () => startMic($("mic"), box);
 $("ovMic").onclick = () => startMic($("ovMic"), $("ov"));
 
-// ---- 画像（受け取り口がある時だけ。ページで縮めてから持つ）と全体へのコメント
+// ---- 画像・色・参考URL（個別のコメント "c" と 全体へのコメント "ov" の両方）。画像はページで縮めてから持つ
 const ov = $("ov"), pick = $("pick");
 ov.value = overall.text || "";
 ov.addEventListener("input", () => { overall.text = ov.value; saveOverall(); updState(); });
+const X = p => p === "c" ? draft : overall;
+function xChanged(p) { showX(p); if (p === "c") refresh(); else { saveOverall(); updState(); } }
 async function shrink(file) {
   const img = await createImageBitmap(file), k = Math.min(1, 1280 / Math.max(img.width, img.height));
   const c = document.createElement("canvas"); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
   c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c.toDataURL("image/jpeg", 0.8);
 }
+for (const p of ["c", "ov"]) {
+  $(p + "Extras").innerHTML =
+    '<label class="urlrow" id="' + p + 'UrlRow" hidden><span>参考にしたいサイトの URL</span><input type="url" id="' + p + 'Url" inputmode="url" autocomplete="off" placeholder="https://…"></label>' +
+    '<div class="cpanel" id="' + p + 'CPanel" hidden>' +
+      '<div class="crow2"><input type="color" id="' + p + 'CIn" value="#029aaa" aria-label="色を選ぶ"><button class="btn line" id="' + p + 'CAdd">この色にしてほしい</button></div>' +
+      '<button class="btn" id="' + p + 'Spoit"><svg class="i" viewBox="0 0 24 24"><path d="M17 2.5l4.5 4.5-3 3-4.5-4.5z"/><path d="M15.5 8.5L6 18l-2 3 3-2 9.5-9.5"/></svg>画面の色を取る（スポイト）</button>' +
+      '<p class="note">左の四角を押すと色を選べます。「画面の色を取る」は、写真の上の押した所の色を取ります。</p></div>' +
+    '<div class="xchips" id="' + p + 'Chips"></div><div class="thumbs" id="' + p + 'Thumbs"></div>';
+  $(p + "Att").onclick = () => { if (p === "c" && !pending) return; pickFor = p; pick.click(); };
+  $(p + "UrlBtn").onclick = () => openX(p, $(p + "UrlRow").hidden ? "url" : null);
+  $(p + "Color").onclick = () => openX(p, $(p + "CPanel").hidden ? "color" : null);
+  $(p + "Url").addEventListener("input", e => { X(p).url = e.target.value; if (p === "c") refresh(); else { saveOverall(); updState(); } markX(p); });
+  $(p + "CAdd").onclick = () => { X(p).colors.push({ hex: $(p + "CIn").value.toUpperCase(), k: "want" }); xChanged(p); toast("色を付けました"); };
+  $(p + "Spoit").onclick = () => startPicking(p);
+}
+function openX(p, which) {       // 色・参考URL の欄を開け閉め（参考URL は入っていれば開いたまま）
+  $(p + "UrlRow").hidden = which !== "url" && !X(p).url;
+  $(p + "CPanel").hidden = which !== "color";
+  if (which === "url") setTimeout(() => $(p + "Url").focus(), 30);
+  markX(p);
+}
+function markX(p) {
+  const o = X(p);
+  $(p + "UrlBtn").classList.toggle("on", !$(p + "UrlRow").hidden || !!o.url); $(p + "UrlBtn").setAttribute("aria-expanded", String(!$(p + "UrlRow").hidden));
+  $(p + "Color").classList.toggle("on", !$(p + "CPanel").hidden || !!o.colors.length); $(p + "Color").setAttribute("aria-expanded", String(!$(p + "CPanel").hidden));
+  $(p + "Att").classList.toggle("on", !!o.images.length);
+  $(p + "Att").querySelector("span").textContent = o.images.length ? "画像 " + o.images.length : "画像";
+}
+const CK = { want: "この色に", page: "画面の色" };
+function showX(p) {
+  const o = X(p), ch = $(p + "Chips"); ch.innerHTML = "";
+  o.colors.forEach((c, i) => {
+    const s = document.createElement("span"); s.className = "xchip"; s.innerHTML = '<i style="background:' + c.hex + '"></i>';
+    s.append(CK[c.k] + " " + c.hex);
+    const x = document.createElement("button"); x.textContent = "×"; x.setAttribute("aria-label", "この色を外す"); x.onclick = () => { o.colors.splice(i, 1); xChanged(p); };
+    s.append(x); ch.append(s);
+  });
+  thumbs($(p + "Thumbs"), o.images, i => { o.images.splice(i, 1); xChanged(p); });
+  $(p + "Url").value = o.url || ""; if (o.url) $(p + "UrlRow").hidden = false;
+  markX(p);
+}
 function thumbs(elm, arr, onDel) { elm.innerHTML = ""; arr.forEach((u, i) => { const im = document.createElement("img"); im.src = u; im.alt = "付けた画像（押すと外す）"; im.title = "押すと外す"; im.onclick = () => onDel(i); elm.append(im); }); }
-function showPend() { thumbs($("pendThumbs"), pendImgs, i => { pendImgs.splice(i, 1); showPend(); refresh(); }); }
-function showOv() { thumbs($("ovthumbs"), overall.images, i => { overall.images.splice(i, 1); saveOverall(); showOv(); updState(); }); }
-let pickFor = "entry";
-async function addImages(files, where) {
+let pickFor = "c";
+async function addImages(files, p) {
   let n = 0;
   for (const f of files) {
     if (!f.type.startsWith("image/")) continue;
-    const u = await shrink(f); n++;
-    if (where === "overall") { overall.images.push(u); saveOverall(); showOv(); updState(); }
-    else if (pending) { pendImgs.push(u); showPend(); refresh(); }
+    if (p === "c" && !pending) break;
+    X(p).images.push(await shrink(f)); n++;
   }
-  if (n) toast("画像を付けました");
+  if (n) { xChanged(p); toast("画像を付けました" + (RECEIVER ? "" : "。送る時は、画像もメッセージに一緒に貼ってください"), RECEIVER ? 1800 : 3200); }
 }
-$("att").onclick = () => { pickFor = "entry"; pick.click(); };
-$("ovatt").onclick = () => { pickFor = "overall"; pick.click(); };
 pick.onchange = () => { addImages([...pick.files], pickFor); pick.value = ""; };
-showOv();
+for (const [el, p] of [[box, "c"], [ov, "ov"]]) {
+  el.addEventListener("paste", e => { const fs = [...((e.clipboardData || {}).files || [])].filter(f => f.type.startsWith("image/")); if (fs.length) { e.preventDefault(); addImages(fs, p); } });
+}
+for (const [el, p] of [[$("composer"), "c"], [document.querySelector(".overall"), "ov"]]) {
+  el.addEventListener("dragover", e => e.preventDefault());
+  el.addEventListener("drop", e => { e.preventDefault(); addImages([...e.dataTransfer.files], p); });
+}
+// スポイト：写真の上の押した所の色を取る（写真は同じ場所に置いてあるので読める。ファイルを直接開いた時は読めない）
+let picking = null;
+function startPicking(p) {
+  if (picking === p) { stopPicking(); return; }
+  picking = p; document.body.classList.add("picking"); $(p + "Spoit").classList.add("on");
+  if (p === "ov" && NARROW()) closeList();
+  toast("写真の上で、取りたい色の所を押してください", 3000);
+}
+function stopPicking() { if (!picking) return; $(picking + "Spoit").classList.remove("on"); picking = null; document.body.classList.remove("picking"); }
+function pickColor(e) {
+  const p = picking, img = $("img"), s = shotOf(), [x, y] = toPage(e);
+  try {
+    const c = document.createElement("canvas"); c.width = c.height = 1; const g = c.getContext("2d");
+    g.drawImage(img, Math.min(img.naturalWidth - 1, Math.floor(x / s.w * img.naturalWidth)), Math.min(img.naturalHeight - 1, Math.floor(y / s.h * img.naturalHeight)), 1, 1, 0, 0, 1, 1);
+    const d = g.getImageData(0, 0, 1, 1).data, hex = "#" + [d[0], d[1], d[2]].map(v => v.toString(16).padStart(2, "0")).join("").toUpperCase();
+    X(p).colors.push({ hex, k: "page" }); $(p + "CIn").value = hex.toLowerCase(); xChanged(p); toast("画面の色 " + hex + " を付けました");
+  } catch (err) { toast("この開き方では画面の色を取れません。左の四角から色を選んでください", 3200); }
+  stopPicking();
+  if (p === "ov" && NARROW()) openList();
+}
+function xText(o, ind) {          // コピー・送信する文に足す行（参考URL・色）
+  const L = [];
+  if (o.url && o.url.trim()) L.push(ind + "参考：" + o.url.trim());
+  if (o.colors && o.colors.length) L.push(ind + "色：" + o.colors.map(c => CK[c.k] + " " + c.hex).join("／"));
+  return L;
+}
+showX("c"); showX("ov");
 
 // ---- 届け方：レビュー完了（受け取り口へ）／コメントを全てコピー
 const sendBtn = $("send"), copyBtn = $("copy");
 const SV_SEND = '<svg class="i" viewBox="0 0 24 24"><path d="M21 3L10.5 13.5"/><path d="M21 3l-6.5 18-4-7.5L3 9.5z"/></svg>', SV_COPY = '<svg class="i" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="3"/><path d="M15.5 8.5V6.5a3 3 0 0 0-3-3h-6a3 3 0 0 0-3 3v6a3 3 0 0 0 3 3h2"/></svg>';
-if (RECEIVER) { sendBtn.hidden = false; $("att").hidden = false; $("ovatt").hidden = false; $("fbArea").hidden = false; }
-else { copyBtn.classList.remove("line"); copyBtn.classList.add("done"); $("flow3").textContent = "終わったら「コメントを全てコピー」して送る"; }
+if (RECEIVER) { sendBtn.hidden = false; $("fbArea").hidden = false; }
+else { copyBtn.classList.remove("line"); copyBtn.classList.add("done"); }
 document.querySelectorAll(".rlabel").forEach(e => e.textContent = RECEIVER ? "レビュー完了" : "全てコピー");
 document.querySelectorAll(".ricon").forEach(e => e.innerHTML = RECEIVER ? SV_SEND : SV_COPY);
 $("topReturn").onclick = $("mReturn").onclick = () => (RECEIVER ? sendBtn : copyBtn).click();
-function ovPending() { return (overall.text || overall.images.length) && (overall.text !== overall.sentText || overall.images.length !== overall.sentN) ? 1 : 0; }
+function ovSig() { return JSON.stringify([(overall.text || "").trim(), overall.images.length, (overall.url || "").trim(), overall.colors]); }
+function ovHas() { return !!((overall.text || "").trim() || overall.images.length || (overall.url || "").trim() || overall.colors.length); }
+function ovPending() { return ovHas() && ovSig() !== overall.sentSig ? 1 : 0; }
 function unsentCount() { return items.filter(it => !it.sent).length + ovPending(); }
 function updState() {
-  const el = $("saveState"), unsent = unsentCount(), any = items.length || (overall.text || "").trim();
+  const el = $("saveState"), unsent = unsentCount(), any = items.length || ovHas();
   document.querySelectorAll(".unsentN").forEach(n => { n.hidden = !RECEIVER || !unsent; n.textContent = unsent; });
   $("allN").textContent = items.length;
   el.hidden = !any; if (!any) return;
@@ -648,29 +781,47 @@ function updState() {
 function showResult(ok, msg) { const r = $("result"); r.hidden = false; r.className = "result " + (ok ? "ok" : "ng"); r.textContent = msg; toast(msg, 3000); }
 function payloadItem(it, i) {       // 受け取り口（Vcheckくんと同じ）の形：t＝番号、tc＝「PC ①」、sec＝場所
   const n = i + 1;
-  return { t: n, tc: (it.dev === "pc" ? "PC " : "スマホ ") + numStr(n), sec: whereText(it), text: it.text, ink: it.d ? inkDesc(it.d) : "", images: it.images || [] };
+  return { t: n, tc: (it.dev === "pc" ? "PC " : "スマホ ") + numStr(n), sec: whereText(it), text: [it.text].concat(xText(it, "")).join("\n"), ink: it.d ? inkDesc(it.d) : "", images: it.images || [] };
 }
 sendBtn.onclick = async () => {
   const todo = items.map((it, i) => [it, i]).filter(([it]) => !it.sent), ovNew = !!ovPending();
   if (!todo.length && !ovNew) { showResult(true, items.length ? "送るものはありません（すべて届いています）" : "まだコメントがありません"); return; }
   sendBtn.disabled = true; sendBtn.querySelector(".lbl").textContent = "送っています…";
-  const body = { video: "hp-" + PID, title: PAGE ? PAGE.title : PID, name: nameEl.value.trim(),
-    overall: ovNew ? { text: overall.text, images: overall.images } : null, items: todo.map(([it, i]) => payloadItem(it, i)) };
+  const groups = PIDS.map(pg => [pg, todo.filter(([it]) => it.pg === pg)]).filter(([pg, g], k) => g.length || (ovNew && k === 0));
+  if (ovNew && !groups.length) groups.push([PIDS[0], []]);
+  let sent = 0, ovDone = !ovNew;
   try {
-    const r = await fetch(RECEIVER, { method: "POST", body: JSON.stringify(body) }), j = await r.json();
-    if (!j.ok) throw new Error("ng");
-    todo.forEach(([it]) => it.sent = true); save();
-    if (ovNew) { overall.sentText = overall.text; overall.sentN = overall.images.length; saveOverall(); }
-    render(); showResult(true, "レビュー完了。" + (todo.length + (ovNew ? 1 : 0)) + " 件が作り手に届きました。ありがとうございました。");
-  } catch (e) { showResult(false, "送れませんでした。電波を確かめて、もう一度「レビュー完了」を押してください（コメントは残っています）。"); }
+    for (const [pg, g] of groups) {
+      const withOv = !ovDone;
+      const body = { video: "hp-" + pg, title: (PAGES[pg] || {}).title || pg, name: nameEl.value.trim(),
+        overall: withOv ? { text: [(MULTI ? "（サイト全体）" : "") + (overall.text || "").trim()].concat(xText(overall, "")).filter(Boolean).join("\n"), images: overall.images } : null,
+        items: g.map(([it, i]) => payloadItem(it, i)) };
+      const r = await fetch(RECEIVER, { method: "POST", body: JSON.stringify(body) }), j = await r.json();
+      if (!j.ok) throw new Error("ng");
+      g.forEach(([it]) => it.sent = true); save(); sent += g.length;
+      if (withOv) { overall.sentSig = ovSig(); saveOverall(); ovDone = true; sent++; }
+    }
+    render(); showResult(true, "レビュー完了。" + sent + " 件が作り手に届きました。ありがとうございました。");
+  } catch (e) { render(); showResult(false, "送れませんでした。電波を確かめて、もう一度「レビュー完了」を押してください（コメントは残っています）。"); }
   sendBtn.disabled = false; sendBtn.querySelector(".lbl").textContent = "レビュー完了";
 };
 function asText() {
   const who = nameEl.value.trim(), ovt = (overall.text || "").trim();
-  const head = ["【" + (PAGE ? PAGE.title : PID) + "】確認コメント " + items.length + "件" + (who ? "（" + who + "）" : ""), PAGE ? PAGE.url + "（" + PAGE.made + " の画面）" : ""].filter(Boolean);
-  const top = ovt || overall.images.length ? ["【全体】", ovt + (overall.images.length ? "（画像 " + overall.images.length + " 枚）" : ""), "ーーーーー"] : [];
-  const lines = items.map((it, i) => numStr(i + 1) + " " + DEVNAME[it.dev] + "・" + whereText(it) + "\n　" + it.text.replace(/\n/g, "\n　") +
-    (it.images && it.images.length ? "　（画像 " + it.images.length + " 枚）" : "") + (it.d ? "\n　✎ " + inkDesc(it.d) : ""));
+  const first = PAGES[PIDS[0]] || {};
+  const name = MULTI ? (first.title || PIDS[0]) + " ほか " + (PIDS.length - 1) + " ページ" : (PAGE ? PAGE.title : PID);
+  const head = ["【" + name + "】確認コメント " + items.length + "件" + (who ? "（" + who + "）" : "")].concat(MULTI ? [] : [PAGE ? PAGE.url + "（" + PAGE.made + " の画面）" : ""]).filter(Boolean);
+  const im = n => n ? "（画像 " + n + " 枚" + (RECEIVER ? "）" : "。画像はメッセージに一緒に貼ってください）") : "";
+  const top = ovHas() ? ["【全体】"].concat(ovt || overall.images.length ? [ovt + im(overall.images.length)] : [], xText(overall, ""), ["ーーーーー"]) : [];
+  const one = (it, i) => [numStr(i + 1) + " " + DEVNAME[it.dev] + "・" + whereText(it), "　" + it.text.replace(/\n/g, "\n　") + im((it.images || []).length)]
+    .concat(xText(it, "　"), it.d ? ["　✎ " + inkDesc(it.d)] : []).join("\n");
+  let lines = [];
+  if (!MULTI) lines = items.map(one);
+  else PIDS.forEach(pg => {
+    const g = items.map((it, i) => [it, i]).filter(([it]) => it.pg === pg); if (!g.length) return;
+    const P = PAGES[pg] || {};
+    lines.push("■ " + labelOf(pg) + "　" + (P.url || "") + "（" + (P.made || "") + " の画面）");
+    g.forEach(([it, i]) => lines.push(one(it, i)));
+  });
   return head.concat(top, lines).join("\n");
 }
 async function copyText(txt) {
@@ -681,7 +832,7 @@ async function copyText(txt) {
   } catch (e) { return false; }
 }
 copyBtn.onclick = async () => {
-  if (!items.length && !(overall.text || "").trim()) { openList(); showResult(false, "まだコピーするコメントがありません"); return; }
+  if (!items.length && !ovHas()) { openList(); showResult(false, "まだコピーするコメントがありません"); return; }
   const txt = asText(), cb = $("copyBox");
   if (await copyText(txt)) { cb.hidden = true; showResult(true, "コピーしました。メッセージに貼り付けて送ってください"); }
   else { openList(); cb.value = txt; cb.hidden = false; showResult(false, "コピーできませんでした。下の枠の文を長押しで全部選んで、コピーしてください"); cb.focus(); cb.select(); }
@@ -691,18 +842,19 @@ let armed = false;
 $("clear").onclick = e => {           // 2回押しで消す（ブラウザの確認画面は使わない）
   const b = e.currentTarget;
   if (!armed) { armed = true; b.textContent = "もう一度押すと消えます"; setTimeout(() => { armed = false; b.textContent = "全部消す"; }, 3000); return; }
-  items = []; save(); overall = { text: "", images: [], sentText: null, sentN: 0 }; ov.value = ""; saveOverall(); showOv();
+  items = []; save(); overall = OV0(); ov.value = ""; saveOverall(); showX("ov");
   armed = false; b.textContent = "全部消す"; selN = 0; render(); toast("コメントを全部消しました");
 };
 
 // ---- 一覧（番号を押すとその場所へ。「編集」「削除」）
 function selectItem(n, fromList) {
   const it = items[n - 1]; if (!it) return;
+  if (it.pg !== PID) setPage(it.pg);
   selN = n;
   if (it.dev !== dev) setDev(it.dev);
   render();
   const go = () => {
-    const s = shotOf(), r = shot.getBoundingClientRect(), head = document.querySelector(".top").offsetHeight;
+    const s = shotOf(), r = shot.getBoundingClientRect(), head = document.querySelector(".top").offsetHeight + ($("pageTabs").hidden ? 0 : $("pageTabs").offsetHeight);
     scrollTo({ top: Math.max(0, scrollY + r.top + it.y / s.h * r.height - head - (innerHeight - head) * 0.35), behavior: "smooth" });
   };
   if (fromList) { closeList(); setTimeout(go, 60); }
@@ -723,9 +875,12 @@ function render() {
     const c = document.createElement("div"); c.className = "ctext"; c.textContent = it.text;
     const bd = document.createElement("div"); bd.className = "badges";
     const badge = (t, cls) => { const s = document.createElement("span"); s.className = "badge" + (cls ? " " + cls : ""); s.textContent = t; bd.append(s); };
+    if (MULTI) badge(labelOf(it.pg));
     badge(DEVNAME[it.dev]);
     if (it.d) badge("描き込み");
     if (it.images && it.images.length) badge("画像 " + it.images.length);
+    (it.colors || []).forEach(c => { const s = document.createElement("span"); s.className = "badge"; s.innerHTML = '<span class="sw" style="background:' + c.hex + '"></span>'; s.append(CK[c.k] + " " + c.hex); bd.append(s); });
+    if (it.url) { const s = document.createElement("span"); s.className = "badge"; const a = document.createElement("a"); a.href = it.url; a.target = "_blank"; a.rel = "noopener"; a.textContent = "参考のサイト"; s.append(a); bd.append(s); }
     if (RECEIVER) badge(it.sent ? "✓ 届いた" : "まだ", it.sent ? "ok" : "wait");
     const acts = document.createElement("div"); acts.className = "acts";
     const ed = document.createElement("button"); ed.className = "btn quiet"; ed.textContent = "編集";
@@ -745,7 +900,7 @@ function render() {
     acts.append(ed, del);
     li.append(nb, c, bd, acts); list.append(li);
   });
-  drawAll(); updState();
+  drawAll(); updState(); tabCounts();
 }
 
 // ---- スマホ：一覧は下から出す
@@ -756,12 +911,12 @@ $("panelClose").onclick = closeList;
 $("scrim").onclick = () => { if (document.body.classList.contains("listopen")) closeList(); };
 $("logo").onclick = e => { e.preventDefault(); scrollTo({ top: 0, behavior: "smooth" }); };
 
-// ---- ホームページチェックくんへの要望（同じ受け取り口に「hpcheck-request」で届く）
+// ---- Webチェックくんへの要望（同じ受け取り口に「webcheck-request」で届く）
 $("fbSend").onclick = async () => {
   const t = $("fbText").value.trim(), b = $("fbSend"), r = $("fbResult");
   if (!t) { toast("要望を書いてください"); $("fbText").focus(); return; }
   b.disabled = true; b.textContent = "送っています…";
-  const body = { video: FEEDBACK_ID, title: "ホームページチェックくんへの要望", name: nameEl.value.trim(),
+  const body = { video: FEEDBACK_ID, title: "Webチェックくんへの要望", name: nameEl.value.trim(),
     overall: { text: t + "\n（見ていたページ：" + (PAGE ? PAGE.title : PID) + "／" + DEVNAME[dev] + "の画面／" + (TOUCH ? "スマホ・タブレット" : "パソコン") + "／v" + VER + "）", images: [] }, items: [] };
   try { const res = await fetch(RECEIVER, { method: "POST", body: JSON.stringify(body) }), j = await res.json(); if (!j.ok) throw 0;
     $("fbText").value = ""; r.hidden = false; r.className = "result ok"; r.textContent = "送りました。ありがとうございます"; }

@@ -1,0 +1,18 @@
+{
+  "title": "クリファ ポートフォリオ",
+  "url": "https://takahashi130.github.io/crifa-portfolio/",
+  "made": "2026-10-28 10:40",
+  "shots": {
+    "pc": {
+      "img": "pc.jpg",
+      "w": 1440,
+      "h": 11219
+    },
+    "sp": {
+      "img": "sp.jpg",
+      "w": 390,
+      "h": 20737
+    }
+  },
+  "label": "ポートフォリオ"
+}

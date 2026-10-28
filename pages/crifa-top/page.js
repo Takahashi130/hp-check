@@ -1,1 +1,1 @@
-(window.HP_PAGES = window.HP_PAGES || {})["crifa-top"] = {"title": "株式会社クリファ トップページ", "url": "https://crifa.co.jp/", "made": "2026-10-28 10:03", "shots": {"pc": {"img": "pc.jpg", "w": 1440, "h": 9112}, "sp": {"img": "sp.jpg", "w": 390, "h": 12482}}};
+(window.HP_PAGES = window.HP_PAGES || {})["crifa-top"] = {"title": "株式会社クリファ トップページ", "url": "https://crifa.co.jp/", "made": "2026-10-28 10:03", "shots": {"pc": {"img": "pc.jpg", "w": 1440, "h": 9112}, "sp": {"img": "sp.jpg", "w": 390, "h": 12482}}, "label": "トップ"};

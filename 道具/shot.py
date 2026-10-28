@@ -1,9 +1,11 @@
-"""ホームページチェックくん：確認してもらうページの縦長の画面写真（PC 幅・スマホ幅）を撮る。
+"""Webチェックくん：確認してもらうページの縦長の画面写真（PC 幅・スマホ幅）を撮る。
 
 使い方：
   python 道具/shot.py <ページの URL> <名前（英数字）> [--title "題"] [--pc 1440] [--sp 390]
 
-  例：python 道具/shot.py https://crifa.co.jp/ crifa-top --title "クリファ トップ"
+  例：python 道具/shot.py https://crifa.co.jp/ crifa-top --title "クリファ トップ" --label "トップ"
+
+  複数ページは1ページずつ撮って、リンクでカンマにつなぐ：index.html?p=crifa-top,crifa-about
 
   pages/<名前>/pc.jpg・sp.jpg・page.json ができる。見るリンクは index.html?p=<名前>
 
@@ -102,6 +104,7 @@ def main():
     ap.add_argument("url")
     ap.add_argument("name", help="pages/ の下のフォルダ名（英数字とハイフン）")
     ap.add_argument("--title", default="")
+    ap.add_argument("--label", default="", help="ページの切り替えボタンに出す短い名前（例：トップ、会社概要）")
     ap.add_argument("--pc", type=int, default=1440)
     ap.add_argument("--sp", type=int, default=390)
     a = ap.parse_args()
@@ -133,7 +136,7 @@ def main():
         print(f"PC   {pc['w']}×{pc['h']} → pc.jpg")
         sp = shoot(c, a.url, a.sp, True, os.path.join(outdir, "sp.jpg"))
         print(f"スマホ {sp['w']}×{sp['h']} → sp.jpg")
-        meta = {"title": a.title or pc["title"] or a.url, "url": a.url, "made": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        meta = {"title": a.title or pc["title"] or a.url, "label": a.label or a.title or pc["title"] or a.name, "url": a.url, "made": datetime.now().strftime("%Y-%m-%d %H:%M"),
                 "shots": {"pc": {"img": "pc.jpg", "w": pc["w"], "h": pc["h"]}, "sp": {"img": "sp.jpg", "w": sp["w"], "h": sp["h"]}}}
         with open(os.path.join(outdir, "page.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=2)
