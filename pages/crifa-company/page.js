@@ -1,0 +1,1 @@
+(window.HP_PAGES = window.HP_PAGES || {})["crifa-company"] = {"title": "株式会社クリファ 会社概要", "label": "会社概要", "url": "https://crifa.co.jp/company/", "made": "2026-10-28 11:00", "shots": {"pc": {"img": "pc.jpg", "w": 1440, "h": 2406}, "sp": {"img": "sp.jpg", "w": 390, "h": 3021}}};

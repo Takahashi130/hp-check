@@ -352,8 +352,8 @@ body.picking .shot { cursor:copy; outline:4px dashed var(--yellow); outline-offs
 const VER = "0.2.0";
 const Q = new URLSearchParams(location.search);
 const $ = id => document.getElementById(id);
-// 確認するページ（いくつでも）。何も無い時は動作見本（クリファのトップとポートフォリオ）
-const PIDS = [...new Set((Q.get("p") || "crifa-top,crifa-portfolio").split(",").map(x => x.trim().replace(/[^A-Za-z0-9_-]/g, "")).filter(Boolean))];
+// 確認するページ（いくつでも）。何も無い時は動作見本（クリファのトップ・内製化支援・会社概要とポートフォリオ）
+const PIDS = [...new Set((Q.get("p") || "crifa-top,crifa-inhouse,crifa-company,crifa-portfolio").split(",").map(x => x.trim().replace(/[^A-Za-z0-9_-]/g, "")).filter(Boolean))];
 let PID = PIDS[0];
 const KEY = "hpcheck:" + PIDS.join(",");
 const TOUCH = matchMedia("(pointer: coarse)").matches;

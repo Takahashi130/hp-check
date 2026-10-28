@@ -1,0 +1,1 @@
+(window.HP_PAGES = window.HP_PAGES || {})["crifa-inhouse"] = {"title": "株式会社クリファ 内製化支援", "label": "内製化支援", "url": "https://crifa.co.jp/in-house/", "made": "2026-10-28 11:00", "shots": {"pc": {"img": "pc.jpg", "w": 1440, "h": 6008}, "sp": {"img": "sp.jpg", "w": 390, "h": 7375}}};
